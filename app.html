@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ProdGate — MVP</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#0a0a08;--ink2:#2d2d28;--ink3:#6b6b62;
+  --bg:#0f0f0c;--bg2:#1a1a16;--bg3:#242420;--bg4:#2e2e28;
+  --border:#333330;--border2:#3a3a34;
+  --paper:#f5f3ec;--paper2:#eeebe0;
+  --gate:#e8390e;--gate2:#ff6640;--gate3:#ff9070;
+  --green:#4ade80;--green-bg:#14532d;
+  --red:#f87171;--red-bg:#7f1d1d;
+  --amber:#fbbf24;--amber-bg:#451a03;
+  --blue:#60a5fa;--blue-bg:#1e3a5f;
+  --r:4px;--r2:8px;
+  --display:'Bebas Neue',sans-serif;
+  --body:'Instrument Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--body);background:var(--bg);color:var(--paper);font-size:14px;display:flex;flex-direction:column}
+
+/* TOPBAR */
+.topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1rem;gap:12px;flex-shrink:0;z-index:50}
+.logo{font-family:var(--display);font-size:22px;letter-spacing:0.04em;color:var(--paper);margin-right:4px}
+.logo span{color:var(--gate2)}
+.session-badge{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:4px 10px;font-family:var(--mono);font-size:11px;color:var(--paper2);cursor:pointer;display:flex;align-items:center;gap:6px;transition:border-color 0.2s}
+.session-badge:hover{border-color:var(--gate)}
+.session-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--gate);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.stats-strip{display:flex;gap:4px}
+.stat-chip{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:4px 10px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;gap:5px}
+.sc-num{font-weight:600}
+.sc-g{color:var(--green)}.sc-r{color:var(--red)}.sc-a{color:var(--amber)}.sc-w{color:var(--paper2)}
+.topbar-btn{background:var(--gate);color:#fff;border:none;border-radius:var(--r);padding:6px 14px;font-family:var(--display);font-size:16px;letter-spacing:0.06em;cursor:pointer;transition:background 0.2s}
+.topbar-btn:hover{background:var(--gate2)}
+
+/* LAYOUT */
+.app-body{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:200px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-section{padding:12px 8px 8px;border-bottom:1px solid var(--border)}
+.sidebar-label{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.12em;padding:0 6px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r);cursor:pointer;transition:background 0.15s;font-size:13px;font-weight:500;color:#8a8a78;margin-bottom:2px}
+.nav-item:hover{background:var(--bg3);color:var(--paper2)}
+.nav-item.active{background:var(--bg4);color:var(--paper)}
+.nav-item .nav-icon{font-size:14px;width:18px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--gate);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;font-family:var(--mono)}
+.projects-list{padding:8px}
+.project-item{padding:6px 10px;border-radius:var(--r);font-size:12px;color:#6a6a58;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.15s;font-family:var(--mono)}
+.project-item:hover{background:var(--bg3);color:var(--paper2)}
+.project-item.active{background:var(--bg3);color:var(--gate2)}
+.project-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.add-project{margin:4px 8px;padding:6px 10px;border-radius:var(--r);font-size:11px;color:#4a4a40;cursor:pointer;border:1px dashed var(--border);text-align:center;font-family:var(--mono);transition:all 0.15s}
+.add-project:hover{border-color:var(--gate);color:var(--gate2)}
+
+/* MAIN */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.tab-bar{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1rem;gap:2px;flex-shrink:0}
+.tab{padding:12px 16px;font-size:12px;font-weight:600;font-family:var(--mono);color:#5a5a50;text-transform:uppercase;letter-spacing:0.06em;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s;display:flex;align-items:center;gap:6px}
+.tab:hover{color:var(--paper2)}
+.tab.active{color:var(--gate2);border-bottom-color:var(--gate2)}
+.tab-badge{background:var(--gate);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px}
+.panel{display:none;flex:1;overflow:hidden;flex-direction:column}
+.panel.active{display:flex}
+.panel-content{flex:1;overflow-y:auto;padding:1rem}
+.panel-content::-webkit-scrollbar{width:5px}
+.panel-content::-webkit-scrollbar-track{background:transparent}
+.panel-content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ADD FORM */
+.add-form{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:1rem;margin-bottom:1rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.form-grid.full{grid-template-columns:1fr}
+.form-grid.three{grid-template-columns:2fr 1fr 1fr}
+input[type=text],input[type=email],textarea,select{width:100%;padding:7px 10px;font-size:12px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--paper);font-family:var(--body);outline:none;transition:border-color 0.2s}
+input:focus,textarea:focus,select:focus{border-color:var(--gate)}
+textarea{resize:vertical;min-height:56px;font-size:12px}
+select option{background:var(--bg2)}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:8px}
+.form-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px}
+.field-group{display:flex;flex-direction:column}
+button,.btn{padding:6px 14px;border-radius:var(--r);font-size:12px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--paper2);font-family:var(--body);font-weight:600;transition:all 0.15s}
+button:hover,.btn:hover{background:var(--bg3)}
+button.primary,.btn.primary{background:var(--gate);color:#fff;border-color:var(--gate)}
+button.primary:hover,.btn.primary:hover{background:var(--gate2);border-color:var(--gate2)}
+button.sm,.btn.sm{padding:3px 9px;font-size:11px}
+button.danger,.btn.danger{color:var(--red);border-color:transparent}
+button.danger:hover,.btn.danger:hover{background:var(--red-bg);border-color:var(--red-bg)}
+button.success,.btn.success{color:var(--green);border-color:var(--green-bg)}
+button.success:hover{background:var(--green-bg)}
+
+/* TEST CASES */
+.tc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:6px;overflow:hidden;transition:border-color 0.15s}
+.tc-card:hover{border-color:var(--border2)}
+.tc-header{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer}
+.tc-checkbox{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;transition:all 0.15s}
+.tc-checkbox.pass{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.tc-checkbox.fail{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.tc-checkbox.blocked{background:var(--amber-bg);border-color:var(--amber);color:var(--amber)}
+.tc-title-text{flex:1;font-size:13px;font-weight:600}
+.tc-title-text.done{text-decoration:line-through;color:var(--ink3)}
+.tc-area{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:2px;background:var(--bg4);color:#6a6a58;letter-spacing:0.04em}
+.status-pill{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:2px;font-weight:600;letter-spacing:0.04em}
+.sp-pending{background:var(--bg4);color:#6a6a58}
+.sp-pass{background:var(--green-bg);color:var(--green)}
+.sp-fail{background:var(--red-bg);color:var(--red)}
+.sp-blocked{background:var(--amber-bg);color:var(--amber)}
+.tc-body{border-top:1px solid var(--border);padding:10px 12px}
+.tc-desc{font-size:12px;color:#8a8a78;line-height:1.55;margin-bottom:8px;font-style:italic}
+.tc-actions{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.status-group{display:flex;gap:4px}
+.note-row{display:flex;gap:6px}
+.note-row input{font-size:12px}
+.tc-note-display{font-size:11px;color:#6a6a58;font-family:var(--mono);margin-top:6px;padding:4px 8px;border-left:2px solid var(--border2)}
+
+/* BUGS */
+.bug-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;margin-bottom:8px;transition:border-color 0.15s}
+.bug-card:hover{border-color:var(--border2)}
+.bug-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px}
+.bug-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+.sev-pill{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:2px;font-weight:600;letter-spacing:0.04em}
+.sev-critical{background:#7f1d1d;color:#fca5a5}
+.sev-major{background:var(--amber-bg);color:var(--amber)}
+.sev-minor{background:var(--bg4);color:#8a8a78}
+.bug-status-pill{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:2px;font-weight:600;letter-spacing:0.04em}
+.bs-open{background:var(--blue-bg);color:var(--blue)}
+.bs-fixed{background:var(--green-bg);color:var(--green)}
+.bs-check-prod{background:#3b1e6e;color:#c4b5fd}
+.bs-verified{background:var(--green-bg);color:var(--green)}
+.env-pill{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:2px;background:var(--bg4);color:#6a6a58}
+.bug-title{font-size:13px;font-weight:600;flex:1;line-height:1.4}
+.bug-desc{font-size:12px;color:#8a8a78;line-height:1.55;margin-bottom:8px;font-style:italic}
+.bug-imgs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.bug-img{width:64px;height:48px;border-radius:var(--r);object-fit:cover;border:1px solid var(--border);cursor:pointer;transition:border-color 0.15s}
+.bug-img:hover{border-color:var(--gate)}
+.bug-add-img{width:64px;height:48px;border-radius:var(--r);border:1px dashed var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:#4a4a40;transition:all 0.15s;background:var(--bg3)}
+.bug-add-img:hover{border-color:var(--gate);color:var(--gate2)}
+.bug-notes{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.bug-note{font-size:11px;color:#6a6a58;font-family:var(--mono);padding:3px 8px;border-left:2px solid var(--border2);display:flex;gap:6px}
+.note-time{color:#3a3a34;flex-shrink:0}
+.bug-footer{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bug-footer input{font-size:12px;flex:1;min-width:120px}
+.prod-verify-row{display:flex;align-items:center;gap:8px;margin-top:8px;padding:7px 10px;border-radius:var(--r);background:var(--bg3);border:1px solid #3b1e6e;font-size:12px;cursor:pointer}
+.prod-verify-row.verified{border-color:var(--green-bg)}
+.pv-checkbox{width:14px;height:14px;border-radius:3px;border:1.5px solid #6a6a58;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800}
+.pv-checkbox.checked{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.pv-label{font-family:var(--mono);font-size:11px;color:#c4b5fd;flex:1}
+.prod-verify-row.verified .pv-label{color:var(--green)}
+input[type=file]{display:none}
+
+/* PROD GATE */
+.gate-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:1rem;flex-shrink:0}
+.gate-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.gate-title{font-family:var(--display);font-size:2rem;letter-spacing:0.04em;color:var(--paper)}
+.gate-title span{color:var(--gate2)}
+.progress-wrap{display:flex;align-items:center;gap:10px}
+.progress-bar{flex:1;height:6px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:var(--gate);border-radius:4px;transition:width 0.4s ease}
+.progress-fill.done{background:var(--green)}
+.progress-text{font-family:var(--mono);font-size:11px;color:#6a6a58;white-space:nowrap}
+.gate-sections{display:flex;flex-direction:column;gap:8px}
+.gate-section-label{font-family:var(--mono);font-size:10px;font-weight:600;color:#4a4a40;text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 6px;display:flex;align-items:center;gap:6px}
+.gate-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color 0.15s}
+.gate-item:hover{border-color:var(--border2)}
+.gate-item.checked{border-color:var(--green-bg);background:#0a1f12}
+.gate-item.checked .gi-label{text-decoration:line-through;color:var(--ink3)}
+.gi-box{width:18px;height:18px;border-radius:3px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;transition:all 0.15s}
+.gate-item.checked .gi-box{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.gi-label{flex:1;font-size:13px;font-weight:500}
+.gi-source{font-family:var(--mono);font-size:10px;color:#4a4a40;margin-left:auto}
+.gate-status-tag{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:2px}
+.gst-fixed{background:var(--green-bg);color:var(--green)}
+.gst-open{background:var(--blue-bg);color:var(--blue)}
+.gst-critical{background:var(--red-bg);color:var(--red)}
+.gate-empty{text-align:center;padding:3rem;color:#4a4a40;font-family:var(--mono);font-size:12px;line-height:1.8}
+.gate-empty-icon{font-size:2.5rem;margin-bottom:0.75rem}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:1.5rem;width:100%;max-width:440px;box-shadow:0 24px 64px rgba(0,0,0,0.5)}
+.modal h3{font-family:var(--display);font-size:1.8rem;letter-spacing:0.04em;margin-bottom:1rem;color:var(--paper)}
+.modal h3 span{color:var(--gate2)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem}
+
+/* IMG PREVIEW */
+.img-preview-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:300;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.img-preview-overlay.hidden{display:none}
+.img-preview-overlay img{max-width:90vw;max-height:85vh;border-radius:var(--r2)}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:3rem 1rem;color:#4a4a40}
+.empty-icon{font-size:2.5rem;margin-bottom:0.75rem}
+.empty-text{font-family:var(--mono);font-size:12px;line-height:1.7}
+
+/* SCROLLBAR global */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* Notification toast */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg2);border:1px solid var(--gate);border-radius:var(--r2);padding:10px 16px;font-family:var(--mono);font-size:12px;color:var(--gate2);z-index:500;transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <span class="logo">PROD<span>GATE</span></span>
+  <div class="session-badge" onclick="showSessionModal()">
+    <span class="dot"></span>
+    <span id="session-label">New Session</span>
+    <span style="color:#4a4a40;font-size:10px">▾</span>
+  </div>
+  <div class="stats-strip">
+    <div class="stat-chip"><span class="sc-num sc-w" id="s-total">0</span><span style="color:#4a4a40">TOTAL</span></div>
+    <div class="stat-chip"><span class="sc-num sc-g" id="s-pass">0</span><span style="color:#4a4a40">PASS</span></div>
+    <div class="stat-chip"><span class="sc-num sc-r" id="s-fail">0</span><span style="color:#4a4a40">FAIL</span></div>
+    <div class="stat-chip"><span class="sc-num sc-a" id="s-pend">0</span><span style="color:#4a4a40">PEND</span></div>
+  </div>
+  <div class="topbar-right">
+    <button class="topbar-btn" onclick="switchTab('gate')">🔴 PROD GATE</button>
+  </div>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Navigate</div>
+      <div class="nav-item active" id="nav-tests" onclick="switchTab('tests')"><span class="nav-icon">✅</span> Test Cases</div>
+      <div class="nav-item" id="nav-bugs" onclick="switchTab('bugs')"><span class="nav-icon">🐛</span> Bugs <span class="nav-badge" id="bug-nav-count" style="display:none">0</span></div>
+      <div class="nav-item" id="nav-gate" onclick="switchTab('gate')"><span class="nav-icon">🔴</span> Prod Gate</div>
+    </div>
+    <div style="flex:1;overflow-y:auto">
+      <div style="padding:8px">
+        <div class="sidebar-label" style="padding:6px 6px 4px">Projects</div>
+        <div id="projects-list"></div>
+        <div class="add-project" onclick="addProject()">+ New Project</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="tab-bar">
+      <div class="tab active" id="tab-tests" onclick="switchTab('tests')">
+        <span>✅</span> TEST CASES
+      </div>
+      <div class="tab" id="tab-bugs" onclick="switchTab('bugs')">
+        <span>🐛</span> BUGS <span class="tab-badge" id="bug-tab-count" style="display:none">0</span>
+      </div>
+      <div class="tab" id="tab-gate" onclick="switchTab('gate')">
+        <span>🔴</span> PROD GATE <span class="tab-badge" id="gate-tab-count" style="display:none">0</span>
+      </div>
+    </div>
+
+    <!-- TEST CASES PANEL -->
+    <div class="panel active" id="panel-tests">
+      <div class="panel-content">
+        <div class="add-form">
+          <div class="form-grid three">
+            <div class="field-group">
+              <div class="form-label">Test Case Title</div>
+              <input type="text" id="tc-title" placeholder="What are you testing?" />
+            </div>
+            <div class="field-group">
+              <div class="form-label">Area / Module</div>
+              <select id="tc-area">
+                <option value="">Select area...</option>
+                <option>Login / Auth</option><option>Dashboard</option><option>Settings</option>
+                <option>Payments</option><option>API</option><option>UI / Layout</option>
+                <option>Mobile</option><option>Email</option><option>Other</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <div class="form-label">Priority</div>
+              <select id="tc-priority">
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid full">
+            <div class="field-group">
+              <div class="form-label">Steps / Notes (optional)</div>
+              <textarea id="tc-steps" placeholder="1. Go to... 2. Click... 3. Expect..."></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="primary" onclick="addTestCase()">+ ADD TEST CASE</button>
+          </div>
+        </div>
+        <div id="tc-list"></div>
+      </div>
+    </div>
+
+    <!-- BUGS PANEL -->
+    <div class="panel" id="panel-bugs">
+      <div class="panel-content">
+        <div class="add-form">
+          <div class="form-grid three">
+            <div class="field-group">
+              <div class="form-label">Bug Title</div>
+              <input type="text" id="bug-title" placeholder="What went wrong?" />
+            </div>
+            <div class="field-group">
+              <div class="form-label">Severity</div>
+              <select id="bug-sev">
+                <option value="major">Major</option>
+                <option value="critical">Critical</option>
+                <option value="minor">Minor</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <div class="form-label">Found on</div>
+              <select id="bug-env">
+                <option value="QA">QA</option>
+                <option value="Prod">Prod</option>
+                <option value="Both">Both</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field-group">
+              <div class="form-label">Description / Steps to reproduce</div>
+              <textarea id="bug-desc" placeholder="Describe what happened and how to reproduce..."></textarea>
+            </div>
+            <div class="field-group">
+              <div class="form-label">Related Test Case (optional)</div>
+              <input type="text" id="bug-tc" placeholder="e.g. CSV upload test" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <label style="font-size:12px;color:#6a6a58;cursor:pointer;display:flex;align-items:center;gap:5px;margin-right:auto">
+              📎 <span id="img-count-label">Attach screenshot</span>
+              <input type="file" id="bug-img-input" accept="image/*" multiple onchange="handleImgAttach(this)" />
+            </label>
+            <button class="primary" onclick="addBug()">+ LOG BUG</button>
+          </div>
+          <div id="pending-img-row" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>
+        </div>
+        <div id="bug-list"></div>
+      </div>
+    </div>
+
+    <!-- PROD GATE PANEL -->
+    <div class="panel" id="panel-gate">
+      <div class="gate-header">
+        <div class="gate-title-row">
+          <div class="gate-title">PROD <span>GATE</span></div>
+          <button class="sm" onclick="addGateItem()">+ Add manual check</button>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" id="gate-progress-fill" style="width:0%"></div></div>
+          <div class="progress-text" id="gate-progress-text">0 / 0 verified</div>
+        </div>
+      </div>
+      <div class="panel-content">
+        <div id="gate-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SESSION MODAL -->
+<div class="modal-overlay hidden" id="session-modal">
+  <div class="modal">
+    <h3>SET <span>SESSION</span></h3>
+    <div class="field-group" style="margin-bottom:10px">
+      <div class="form-label">Session / Feature Name</div>
+      <input type="text" id="session-input" placeholder="e.g. checkout-v2, login-bug-fix..." />
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeSessionModal()">Cancel</button>
+      <button class="primary" onclick="saveSession()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMG PREVIEW -->
+<div class="img-preview-overlay hidden" id="img-preview" onclick="closeImgPreview()">
+  <img id="img-preview-src" src="" alt="Screenshot preview" />
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+var S = {
+  session: 'New Session',
+  activeProject: 'default',
+  projects: [{id:'default',name:'Main Project',color:'#e8390e'}],
+  tests: [],
+  bugs: [],
+  gateItems: [],
+  openTc: null
+};
+
+function save(){try{localStorage.setItem('prodgate_mvp',JSON.stringify(S))}catch(e){}}
+function load(){try{var d=localStorage.getItem('prodgate_mvp');if(d)S=Object.assign(S,JSON.parse(d))}catch(e){}}
+load();
+
+// UTILS
+function uid(){return Date.now()+'_'+Math.random().toString(36).substr(2,6)}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
+
+// SESSION
+document.getElementById('session-label').textContent=S.session;
+function showSessionModal(){
+  document.getElementById('session-input').value=S.session;
+  document.getElementById('session-modal').classList.remove('hidden');
+}
+function closeSessionModal(){document.getElementById('session-modal').classList.add('hidden')}
+function saveSession(){
+  var v=document.getElementById('session-input').value.trim();
+  if(v){S.session=v;save();document.getElementById('session-label').textContent=v;}
+  closeSessionModal();
+}
+
+// PROJECTS
+function renderProjects(){
+  var el=document.getElementById('projects-list');
+  el.innerHTML=S.projects.map(function(p){
+    return '<div class="project-item'+(p.id===S.activeProject?' active':'')+'" onclick="setProject(\''+p.id+'\')">'
+      +'<span class="project-dot" style="background:'+p.color+'"></span>'
+      +esc(p.name)+'</div>';
+  }).join('');
+}
+function setProject(id){S.activeProject=id;save();renderProjects();}
+function addProject(){
+  var name=prompt('Project name:');if(!name)return;
+  var colors=['#e8390e','#4ade80','#60a5fa','#fbbf24','#c084fc','#f472b6'];
+  var color=colors[S.projects.length%colors.length];
+  S.projects.push({id:uid(),name:name,color:color});
+  save();renderProjects();
+}
+renderProjects();
+
+// TABS
+var activeTab='tests';
+function switchTab(t){
+  activeTab=t;
+  ['tests','bugs','gate'].forEach(function(x){
+    document.getElementById('panel-'+x).classList.toggle('active',x===t);
+    document.getElementById('tab-'+x).classList.toggle('active',x===t);
+    document.getElementById('nav-'+x).classList.toggle('active',x===t);
+  });
+  if(t==='gate')renderGate();
+}
+
+// STATS
+function updateStats(){
+  var ts=S.tests;
+  document.getElementById('s-total').textContent=ts.length;
+  document.getElementById('s-pass').textContent=ts.filter(function(t){return t.status==='pass'}).length;
+  document.getElementById('s-fail').textContent=ts.filter(function(t){return t.status==='fail'}).length;
+  document.getElementById('s-pend').textContent=ts.filter(function(t){return t.status!=='pass'&&t.status!=='fail'}).length;
+  var openBugs=S.bugs.filter(function(b){return b.status!=='verified'}).length;
+  var countEl=[document.getElementById('bug-nav-count'),document.getElementById('bug-tab-count')];
+  countEl.forEach(function(el){
+    el.textContent=openBugs;
+    el.style.display=openBugs>0?'':'none';
+  });
+  var gateLeft=S.gateItems.filter(function(x){return !x.checked}).length;
+  var gEl=document.getElementById('gate-tab-count');
+  gEl.textContent=gateLeft;
+  gEl.style.display=gateLeft>0?'':'none';
+}
+
+// TEST CASES
+function addTestCase(){
+  var title=document.getElementById('tc-title').value.trim();
+  if(!title)return;
+  S.tests.push({
+    id:uid(),title:title,
+    area:document.getElementById('tc-area').value,
+    priority:document.getElementById('tc-priority').value,
+    steps:document.getElementById('tc-steps').value.trim(),
+    status:'pending',note:'',
+    created:new Date().toLocaleString(),
+    project:S.activeProject
+  });
+  ['tc-title','tc-steps'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('tc-area').value='';
+  save();renderTests();toast('Test case added ✓');
+}
+
+function setTcStatus(id,s){
+  var tc=S.tests.find(function(t){return t.id===id});
+  if(tc){tc.status=s;save();renderTests();}
+}
+function deleteTc(id){
+  if(!confirm('Delete this test case?'))return;
+  S.tests=S.tests.filter(function(t){return t.id!==id});
+  save();renderTests();
+}
+function saveTcNote(id){
+  var tc=S.tests.find(function(t){return t.id===id});
+  var el=document.getElementById('tcn_'+id);
+  if(tc&&el){tc.note=el.value;save();}
+}
+function toggleTc(id){S.openTc=S.openTc===id?null:id;renderTests();}
+
+function renderTests(){
+  updateStats();
+  var el=document.getElementById('tc-list');
+  if(S.tests.length===0){
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No test cases yet.<br/>Add one above to get started.</div></div>';
+    return;
+  }
+  var pMap={pending:'sp-pending',pass:'sp-pass',fail:'sp-fail',blocked:'sp-blocked'};
+  var cMap={pass:'✓',fail:'✕',blocked:'—'};
+  el.innerHTML=S.tests.map(function(tc){
+    var open=S.openTc===tc.id;
+    var pc=pMap[tc.status]||'sp-pending';
+    var cc=cMap[tc.status]||'';
+    var chkCls=tc.status!=='pending'?tc.status:'';
+    return '<div class="tc-card">'+
+      '<div class="tc-header" onclick="toggleTc(\''+tc.id+'\')">'
+        +'<div class="tc-checkbox '+chkCls+'">'+cc+'</div>'
+        +'<span class="tc-title-text'+(tc.status==='pass'?' done':'')+'">'+esc(tc.title)+'</span>'
+        +(tc.area?'<span class="tc-area">'+esc(tc.area)+'</span>':'')+
+        '<span class="status-pill '+pc+'">'+tc.status.toUpperCase()+'</span>'
+        +'<span style="color:#3a3a34;font-size:11px;margin-left:4px">'+(open?'▲':'▼')+'</span>'
+      +'</div>'
+      +(open?
+        '<div class="tc-body">'
+          +(tc.steps?'<div class="tc-desc">'+esc(tc.steps).replace(/\n/g,'<br>')+'</div>':'')
+          +'<div style="font-family:var(--mono);font-size:10px;color:#4a4a40;margin-bottom:8px">'+esc(tc.created)+(tc.priority?' · PRIORITY: '+tc.priority.toUpperCase():' ')+'</div>'
+          +'<div class="tc-actions">'
+            +'<div class="status-group">'
+              +'<button class="sm success" onclick="setTcStatus(\''+tc.id+'\',\'pass\')">✓ PASS</button>'
+              +'<button class="sm" style="color:var(--red);border-color:var(--red-bg)" onclick="setTcStatus(\''+tc.id+'\',\'fail\')">✕ FAIL</button>'
+              +'<button class="sm" style="color:var(--amber);border-color:var(--amber-bg)" onclick="setTcStatus(\''+tc.id+'\',\'blocked\')">— BLOCKED</button>'
+              +'<button class="sm" onclick="setTcStatus(\''+tc.id+'\',\'pending\')">RESET</button>'
+            +'</div>'
+            +'<button class="sm danger" onclick="event.stopPropagation();deleteTc(\''+tc.id+'\')">🗑</button>'
+          +'</div>'
+          +'<div class="note-row">'
+            +'<input type="text" id="tcn_'+tc.id+'" placeholder="Add a note..." value="'+esc(tc.note||'')+'" onblur="saveTcNote(\''+tc.id+'\')" onkeydown="if(event.key===\'Enter\')saveTcNote(\''+tc.id+'\')" />'
+          +'</div>'
+          +(tc.note?'<div class="tc-note-display">'+esc(tc.note)+'</div>':'')
+        +'</div>'
+      :'')
+    +'</div>';
+  }).join('');
+}
+
+// BUGS
+var pendingImgs=[];
+function handleImgAttach(inp){
+  Array.from(inp.files).forEach(function(f){
+    var r=new FileReader();
+    r.onload=function(e){pendingImgs.push(e.target.result);renderPendingImgs();};
+    r.readAsDataURL(f);
+  });
+  inp.value='';
+}
+function renderPendingImgs(){
+  var el=document.getElementById('pending-img-row');
+  document.getElementById('img-count-label').textContent=pendingImgs.length>0?pendingImgs.length+' image(s) attached':'Attach screenshot';
+  el.innerHTML=pendingImgs.map(function(src,i){
+    return '<img src="'+src+'" style="width:60px;height:45px;border-radius:4px;object-fit:cover;border:1px solid var(--border);cursor:pointer" onclick="removePendingImg('+i+')" title="Click to remove" />';
+  }).join('');
+}
+function removePendingImg(i){pendingImgs.splice(i,1);renderPendingImgs();}
+
+function addBug(){
+  var title=document.getElementById('bug-title').value.trim();
+  if(!title)return;
+  var bug={
+    id:uid(),title:title,
+    severity:document.getElementById('bug-sev').value,
+    desc:document.getElementById('bug-desc').value.trim(),
+    tc:document.getElementById('bug-tc').value.trim(),
+    env:document.getElementById('bug-env').value,
+    status:'open',
+    images:pendingImgs.slice(),
+    notes:[],
+    prodVerified:false,
+    created:new Date().toLocaleString(),
+    project:S.activeProject
+  };
+  S.bugs.push(bug);
+  // auto-add to prod gate
+  if(bug.env==='QA'||bug.env==='Both'){
+    S.gateItems.push({id:uid(),label:'Verify fix: '+bug.title,checked:false,bugId:bug.id,auto:true});
+  }
+  ['bug-title','bug-desc','bug-tc'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('bug-sev').value='major';
+  pendingImgs=[];renderPendingImgs();
+  save();renderBugs();updateStats();
+  toast('Bug logged → auto-added to Prod Gate ✓');
+}
+
+function setBugStatus(id,s){
+  var b=S.bugs.find(function(x){return x.id===id});
+  if(b){b.status=s;if(s==='verified')b.prodVerified=true;save();renderBugs();updateStats();}
+}
+function deleteBug(id){
+  if(!confirm('Delete this bug?'))return;
+  S.bugs=S.bugs.filter(function(b){return b.id!==id});
+  save();renderBugs();updateStats();
+}
+function addBugNote(id){
+  var inp=document.getElementById('bn_'+id);if(!inp||!inp.value.trim())return;
+  var b=S.bugs.find(function(x){return x.id===id});
+  if(b){b.notes.push({text:inp.value.trim(),time:new Date().toLocaleTimeString()});inp.value='';save();renderBugs();}
+}
+function toggleProdVerify(id){
+  var b=S.bugs.find(function(x){return x.id===id});
+  if(b){
+    b.prodVerified=!b.prodVerified;
+    if(b.prodVerified)b.status='verified';
+    // sync gate item
+    var gi=S.gateItems.find(function(x){return x.bugId===id});
+    if(gi)gi.checked=b.prodVerified;
+    save();renderBugs();renderGate();updateStats();
+  }
+}
+
+function renderBugs(){
+  updateStats();
+  var el=document.getElementById('bug-list');
+  if(S.bugs.length===0){
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">🐛</div><div class="empty-text">No bugs logged yet.<br/>Found something? Log it above.</div></div>';
+    return;
+  }
+  var scls={critical:'sev-critical',major:'sev-major',minor:'sev-minor'};
+  var stcls={open:'bs-open',fixed:'bs-fixed','check-prod':'bs-check-prod',verified:'bs-verified'};
+  var stlbl={open:'OPEN',fixed:'FIXED ON QA','check-prod':'CHECK PROD',verified:'VERIFIED ON PROD'};
+  el.innerHTML=S.bugs.map(function(b){
+    var needsProd=(b.env==='QA'||b.env==='Both')&&!b.prodVerified;
+    return '<div class="bug-card">'
+      +'<div class="bug-top">'
+        +'<div style="flex:1">'
+          +'<div class="bug-meta">'
+            +'<span class="sev-pill '+(scls[b.severity]||'sev-minor')+'">'+b.severity.toUpperCase()+'</span>'
+            +'<span class="bug-status-pill '+(stcls[b.status]||'bs-open')+'">'+(stlbl[b.status]||b.status)+'</span>'
+            +'<span class="env-pill">'+b.env+'</span>'
+            +(b.tc?'<span class="env-pill">→ '+esc(b.tc)+'</span>':'')
+          +'</div>'
+          +'<div class="bug-title">'+esc(b.title)+'</div>'
+        +'</div>'
+        +'<button class="sm danger" onclick="deleteBug(\''+b.id+'\')">🗑</button>'
+      +'</div>'
+      +(b.desc?'<div class="bug-desc">'+esc(b.desc).replace(/\n/g,'<br>')+'</div>':'')
+      +(b.images.length?
+        '<div class="bug-imgs">'+
+          b.images.map(function(src){return '<img src="'+src+'" class="bug-img" onclick="previewImg(\''+src+'\'.replace(/\'/g,\'\\\\\'\'))" />'}).join('')+
+          '<label class="bug-add-img" title="Add more screenshots"><input type="file" accept="image/*" onchange="addBugImg(\''+b.id+'\',this)" />+</label>'
+        +'</div>'
+      :'<div class="bug-imgs"><label class="bug-add-img" title="Attach screenshot"><input type="file" accept="image/*" onchange="addBugImg(\''+b.id+'\',this)" />📎</label></div>')
+      +(b.notes.length?
+        '<div class="bug-notes">'+b.notes.map(function(n){
+          return '<div class="bug-note"><span class="note-time">'+n.time+'</span>'+esc(n.text)+'</div>';
+        }).join('')+'</div>':'')
+      +(needsProd?
+        '<div class="prod-verify-row" onclick="toggleProdVerify(\''+b.id+'\')">'
+          +'<div class="pv-checkbox'+(b.prodVerified?' checked':'')+'">'+( b.prodVerified?'✓':'')+'</div>'
+          +'<span class="pv-label">Verified fix also on Prod?</span>'
+          +'<span style="font-family:var(--mono);font-size:10px;color:#6a4a9a">PROD GATE</span>'
+        +'</div>'
+      :'')
+      +'<div class="bug-footer">'
+        +'<input type="text" id="bn_'+b.id+'" placeholder="Add note / Slack ref..." onkeydown="if(event.key===\'Enter\')addBugNote(\''+b.id+'\')" />'
+        +'<button class="sm" onclick="addBugNote(\''+b.id+'\')">+ NOTE</button>'
+        +(b.status==='open'?'<button class="sm success" onclick="setBugStatus(\''+b.id+'\',\'fixed\')">FIXED QA</button>':'')
+        +(b.status==='fixed'?'<button class="sm" style="color:#c4b5fd;border-color:#3b1e6e" onclick="setBugStatus(\''+b.id+'\',\'check-prod\')">CHECK PROD</button>':'')
+        +(b.status==='check-prod'?'<button class="sm success" onclick="setBugStatus(\''+b.id+'\',\'verified\')">PROD OK ✓</button>':'')
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function addBugImg(bugId,inp){
+  if(!inp.files[0])return;
+  var r=new FileReader();
+  r.onload=function(e){
+    var b=S.bugs.find(function(x){return x.id===bugId});
+    if(b){b.images.push(e.target.result);save();renderBugs();}
+  };
+  r.readAsDataURL(inp.files[0]);
+  inp.value='';
+}
+
+// PROD GATE
+function addGateItem(){
+  var label=prompt('What to verify on Prod?');if(!label)return;
+  S.gateItems.push({id:uid(),label:label,checked:false,auto:false});
+  save();renderGate();updateStats();
+}
+function toggleGateItem(id){
+  var item=S.gateItems.find(function(x){return x.id===id});
+  if(item){
+    item.checked=!item.checked;
+    // sync bug if linked
+    if(item.bugId){
+      var b=S.bugs.find(function(x){return x.id===item.bugId});
+      if(b){b.prodVerified=item.checked;if(item.checked)b.status='verified';}
+    }
+    save();renderGate();renderBugs();updateStats();
+  }
+}
+function deleteGateItem(id){
+  S.gateItems=S.gateItems.filter(function(x){return x.id!==id});
+  save();renderGate();updateStats();
+}
+
+function renderGate(){
+  var auto=S.gateItems.filter(function(x){return x.auto});
+  var manual=S.gateItems.filter(function(x){return !x.auto});
+  var total=S.gateItems.length;
+  var done=S.gateItems.filter(function(x){return x.checked}).length;
+  var pct=total?Math.round(done/total*100):0;
+  document.getElementById('gate-progress-fill').style.width=pct+'%';
+  document.getElementById('gate-progress-fill').classList.toggle('done',pct===100);
+  document.getElementById('gate-progress-text').textContent=done+' / '+total+' verified on Prod';
+  var el=document.getElementById('gate-content');
+  if(total===0){
+    el.innerHTML='<div class="gate-empty"><div class="gate-empty-icon">🔴</div>PROD GATE IS CLEAR<br/><br/>Bugs you log on QA will<br/>auto-appear here as Prod checks.<br/><br/><span style="color:#3a3a34">Or add a manual check above.</span></div>';
+    updateStats();return;
+  }
+  var stcls={open:'gst-open',fixed:'gst-fixed',critical:'gst-critical',verified:'gst-fixed'};
+  var stlbl={open:'Open',fixed:'Fixed QA','check-prod':'Ready to check',verified:'✓ Verified'};
+  var fromBugs=auto.length?
+    '<div class="gate-section-label">🐛 FROM BUG LOG — AUTO-ADDED</div>'
+    +auto.map(function(item){
+      var b=S.bugs.find(function(x){return x.id===item.bugId});
+      var statusLabel=b?stlbl[b.status]||b.status:'';
+      var statusCls=b?stcls[b.status]||'gst-open':'';
+      return '<div class="gate-item'+(item.checked?' checked':'')+'" onclick="toggleGateItem(\''+item.id+'\')">'
+        +'<div class="gi-box">'+(item.checked?'✓':'')+'</div>'
+        +'<span class="gi-label">'+esc(item.label)+'</span>'
+        +(b?'<span class="gate-status-tag '+statusCls+'">'+statusLabel+'</span>':'')
+        +'<button class="sm danger" onclick="event.stopPropagation();deleteGateItem(\''+item.id+'\')">🗑</button>'
+      +'</div>';
+    }).join('')
+  :'';
+  var fromManual=manual.length?
+    '<div class="gate-section-label">📋 MANUAL CHECKS</div>'
+    +manual.map(function(item){
+      return '<div class="gate-item'+(item.checked?' checked':'')+'" onclick="toggleGateItem(\''+item.id+'\')">'
+        +'<div class="gi-box">'+(item.checked?'✓':'')+'</div>'
+        +'<span class="gi-label">'+esc(item.label)+'</span>'
+        +'<button class="sm danger" onclick="event.stopPropagation();deleteGateItem(\''+item.id+'\')">🗑</button>'
+      +'</div>';
+    }).join('')
+  :'';
+  el.innerHTML='<div class="gate-sections">'+fromBugs+fromManual+'</div>';
+  updateStats();
+}
+
+// IMG PREVIEW
+function previewImg(src){
+  document.getElementById('img-preview-src').src=src;
+  document.getElementById('img-preview').classList.remove('hidden');
+}
+function closeImgPreview(){document.getElementById('img-preview').classList.add('hidden');}
+
+// KEYBOARD
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    closeSessionModal();closeImgPreview();
+  }
+});
+
+// INIT
+renderTests();renderBugs();renderGate();updateStats();
+</script>
+</body>
+</html>

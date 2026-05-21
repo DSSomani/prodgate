@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ProdGate — The Gate Between QA and Production</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --ink: #0a0a08;
+  --ink2: #2d2d28;
+  --ink3: #6b6b62;
+  --paper: #f5f3ec;
+  --paper2: #eeebe0;
+  --paper3: #dedad0;
+  --gate: #e8390e;
+  --gate2: #ff6640;
+  --green: #1a7a3a;
+  --green-bg: #e6f4eb;
+  --amber: #b86e00;
+  --amber-bg: #fff3dc;
+  --blue: #1a4a8a;
+  --blue-bg: #e6edf8;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Bebas Neue', sans-serif;
+  --body: 'Instrument Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--body); background: var(--paper); color: var(--ink); overflow-x: hidden; }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(245,243,236,0.93); backdrop-filter: blur(16px);
+  border-bottom: 1.5px solid var(--paper3);
+  padding: 0 2rem;
+}
+.nav-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 58px; }
+.logo { font-family: var(--display); font-size: 26px; letter-spacing: 0.04em; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 2px; }
+.logo-gate { color: var(--gate); }
+.nav-links { display: flex; align-items: center; gap: 2rem; }
+.nav-links a { font-size: 13px; font-weight: 600; color: var(--ink2); text-decoration: none; letter-spacing: 0.03em; text-transform: uppercase; transition: color 0.2s; }
+.nav-links a:hover { color: var(--gate); }
+.nav-cta { background: var(--gate); color: #fff; padding: 8px 20px; border-radius: 3px; font-size: 13px; font-weight: 700; font-family: var(--display); font-size: 16px; letter-spacing: 0.08em; text-decoration: none; transition: background 0.2s, transform 0.15s; }
+.nav-cta:hover { background: var(--ink); transform: translateY(-1px); }
+
+/* HERO */
+.hero-wrap { max-width: 1100px; margin: 0 auto; padding: 5rem 2rem 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+.hero-tag { display: inline-flex; align-items: center; gap: 7px; background: var(--amber-bg); border: 1px solid #e8d08a; color: var(--amber); font-size: 11px; font-weight: 700; font-family: var(--mono); letter-spacing: 0.08em; padding: 5px 12px; border-radius: 2px; margin-bottom: 1.5rem; }
+.tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gate); animation: pulse 1.8s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+.hero h1 { font-family: var(--display); font-size: clamp(4rem, 6vw, 6.5rem); line-height: 0.92; letter-spacing: 0.02em; color: var(--ink); margin-bottom: 1.5rem; }
+.hero h1 .accent { color: var(--gate); }
+.hero h1 .line2 { display: block; }
+.hero-sub { font-size: 17px; line-height: 1.7; color: var(--ink2); margin-bottom: 2.5rem; max-width: 480px; font-weight: 400; }
+.hero-sub strong { color: var(--ink); font-weight: 600; }
+.hero-actions { display: flex; gap: 12px; align-items: center; margin-bottom: 2.5rem; }
+.btn-primary { background: var(--gate); color: #fff; padding: 14px 30px; border-radius: 3px; font-family: var(--display); font-size: 20px; letter-spacing: 0.08em; text-decoration: none; transition: all 0.2s; box-shadow: 4px 4px 0 var(--ink); }
+.btn-primary:hover { background: var(--ink); transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--gate); }
+.btn-ghost { font-size: 13px; font-weight: 600; color: var(--ink3); text-decoration: none; display: flex; align-items: center; gap: 5px; letter-spacing: 0.02em; }
+.btn-ghost:hover { color: var(--gate); }
+.hero-proof { display: flex; align-items: center; gap: 12px; }
+.proof-avs { display: flex; }
+.proof-avs span { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--paper); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; margin-left: -8px; font-family: var(--display); letter-spacing: 0; }
+.proof-avs span:first-child { margin-left: 0; }
+.av1{background:#e2d4f5;color:#6a3db5} .av2{background:#d4e8f5;color:#1a5a8a} .av3{background:#f5d4d4;color:#8a1a1a} .av4{background:#d4f5e2;color:#1a7a3a} .av5{background:#f5f0d4;color:#7a6a1a}
+.proof-text { font-size: 13px; color: var(--ink3); line-height: 1.4; }
+.proof-text strong { color: var(--ink2); font-weight: 600; }
+
+/* MOCKUP */
+.hero-visual { position: relative; }
+.mockup-shell {
+  background: var(--ink); border-radius: 8px;
+  overflow: hidden; box-shadow: 8px 8px 0 var(--gate), 0 24px 64px rgba(10,10,8,0.18);
+  border: 1.5px solid var(--ink2);
+}
+.mockup-topbar { background: #1a1a16; padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #2a2a24; }
+.mdot { width: 10px; height: 10px; border-radius: 50%; }
+.mdot-r{background:#E24B4A} .mdot-y{background:#EF9F27} .mdot-g{background:#2a7a4a}
+.mockup-title-bar { flex: 1; text-align: center; font-family: var(--mono); font-size: 11px; color: #5a5a50; }
+.mockup-tabs { background: #141410; display: flex; border-bottom: 1px solid #2a2a24; }
+.m-tab { padding: 9px 16px; font-size: 11px; font-family: var(--body); font-weight: 600; color: #4a4a40; letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+.m-tab.active { color: var(--gate2); border-bottom-color: var(--gate2); }
+.mockup-body { padding: 14px; background: #0f0f0c; }
+.m-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-bottom: 12px; }
+.m-stat { background: #1a1a16; border-radius: 4px; padding: 8px 10px; text-align: center; border: 1px solid #2a2a24; }
+.m-snum { font-family: var(--display); font-size: 22px; letter-spacing: 0.04em; }
+.m-slbl { font-size: 9px; color: #4a4a40; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 1px; }
+.c-g{color:#4ade80} .c-r{color:#f87171} .c-a{color:#fbbf24} .c-w{color:#e8e8e0}
+.m-row { background: #1a1a16; border: 1px solid #2a2a24; border-radius: 4px; padding: 8px 10px; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+.m-icon { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 800; }
+.i-pass{background:#166534;color:#4ade80} .i-fail{background:#7f1d1d;color:#f87171} .i-pend{background:#2a2a24;border:1px solid #3a3a30;}
+.m-rtitle { font-size: 11px; color: #b8b8a8; flex: 1; font-family: var(--body); }
+.m-badge { font-size: 9px; padding: 2px 6px; border-radius: 2px; font-family: var(--mono); font-weight: 600; letter-spacing: 0.04em; }
+.b-pass{background:#14532d;color:#4ade80} .b-fail{background:#7f1d1d;color:#f87171} .b-pend{background:#2a2a1a;color:#6b6b50}
+.m-gate-alert { margin-top: 10px; background: #1a0f08; border: 1px solid var(--gate); border-radius: 4px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
+.gate-icon { font-size: 14px; flex-shrink: 0; }
+.gate-text { font-size: 10px; color: var(--gate2); font-family: var(--mono); line-height: 1.4; }
+.gate-text strong { color: #fff; }
+
+/* STRIP */
+.strip { background: var(--gate); padding: 14px 2rem; overflow: hidden; }
+.strip-inner { display: flex; gap: 3rem; animation: scroll-strip 20s linear infinite; white-space: nowrap; width: max-content; }
+.strip-item { font-family: var(--display); font-size: 18px; letter-spacing: 0.1em; color: #fff; display: flex; align-items: center; gap: 1rem; }
+.strip-sep { opacity: 0.4; font-size: 14px; }
+@keyframes scroll-strip { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* PROBLEM */
+.section { max-width: 1100px; margin: 0 auto; padding: 5rem 2rem; }
+.sec-label { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--gate); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 1rem; }
+.sec-title { font-family: var(--display); font-size: clamp(2.8rem, 5vw, 5rem); line-height: 0.95; letter-spacing: 0.02em; margin-bottom: 1.5rem; }
+.sec-sub { font-size: 17px; color: var(--ink2); line-height: 1.7; max-width: 560px; }
+.pain-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--paper3); border: 1.5px solid var(--paper3); border-radius: 6px; overflow: hidden; margin-top: 3rem; }
+.pain-card { background: var(--paper); padding: 2rem; }
+.pain-num { font-family: var(--display); font-size: 4rem; color: var(--paper3); line-height: 1; margin-bottom: 0.5rem; }
+.pain-icon { font-size: 2rem; margin-bottom: 1rem; }
+.pain-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
+.pain-card p { font-size: 13px; color: var(--ink2); line-height: 1.6; }
+.pain-quote { margin-top: 1rem; padding: 8px 12px; background: var(--paper2); border-left: 3px solid var(--gate); font-size: 12px; font-style: italic; color: var(--ink3); font-family: var(--mono); }
+
+/* FEATURES */
+.features-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; margin-top: 3rem; }
+.feature-item { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 2rem; }
+.feat-num { font-family: var(--display); font-size: 3rem; color: var(--paper3); line-height: 1; flex-shrink: 0; width: 52px; text-align: center; }
+.feat-body h4 { font-size: 16px; font-weight: 700; margin-bottom: 5px; letter-spacing: -0.01em; }
+.feat-body p { font-size: 13px; color: var(--ink2); line-height: 1.6; }
+.feat-badge { display: inline-block; margin-top: 6px; font-size: 10px; font-family: var(--mono); padding: 2px 7px; border-radius: 2px; font-weight: 600; }
+.fb-new { background: var(--amber-bg); color: var(--amber); }
+.fb-core { background: var(--blue-bg); color: var(--blue); }
+.gate-box { background: var(--ink); color: var(--paper); border-radius: 6px; padding: 2.5rem; box-shadow: 6px 6px 0 var(--gate); }
+.gate-box h3 { font-family: var(--display); font-size: 2.5rem; letter-spacing: 0.04em; color: var(--paper); margin-bottom: 0.75rem; line-height: 1; }
+.gate-box h3 span { color: var(--gate2); }
+.gate-box p { font-size: 14px; color: #a0a090; line-height: 1.7; margin-bottom: 1.5rem; }
+.gate-flow { display: flex; flex-direction: column; gap: 8px; }
+.gf-step { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #1a1a16; border-radius: 4px; border-left: 3px solid var(--gate); }
+.gf-num { font-family: var(--display); font-size: 20px; color: var(--gate2); width: 20px; flex-shrink: 0; }
+.gf-text { font-size: 12px; color: #c0c0b0; font-family: var(--mono); }
+
+/* PRICING */
+#pricing { background: var(--ink); }
+.pricing-inner { max-width: 1100px; margin: 0 auto; padding: 5rem 2rem; }
+.pricing-inner .sec-title { color: var(--paper); }
+.pricing-inner .sec-label { color: var(--gate2); }
+.pricing-inner .sec-sub { color: #a0a090; }
+.pricing-toggle { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 2.5rem 0 2rem; }
+.tgl-label { font-size: 13px; font-weight: 600; color: #a0a090; font-family: var(--mono); }
+.tgl-btn { width: 48px; height: 26px; background: #2a2a24; border-radius: 50px; position: relative; cursor: pointer; border: none; outline: none; transition: background 0.2s; }
+.tgl-btn.on { background: var(--gate); }
+.tgl-knob { width: 20px; height: 20px; border-radius: 50%; background: #fff; position: absolute; top: 3px; left: 3px; transition: left 0.2s; pointer-events: none; }
+.tgl-btn.on .tgl-knob { left: 25px; }
+.save-pill { background: var(--green); color: var(--green-bg); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 2px; font-family: var(--mono); }
+.plans-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.plan { background: #141410; border: 1.5px solid #2a2a24; border-radius: 6px; padding: 2rem; position: relative; transition: border-color 0.2s, transform 0.2s; }
+.plan:hover { border-color: #4a4a40; transform: translateY(-4px); }
+.plan.featured { border-color: var(--gate); background: #1a0f08; }
+.plan.featured:hover { border-color: var(--gate2); }
+.plan-hot { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: var(--gate); color: #fff; font-family: var(--display); font-size: 14px; letter-spacing: 0.1em; padding: 2px 16px; border-radius: 2px; white-space: nowrap; }
+.plan-name { font-family: var(--mono); font-size: 11px; font-weight: 600; color: #5a5a50; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+.plan.featured .plan-name { color: var(--gate2); }
+.plan-price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 6px; }
+.price-n { font-family: var(--display); font-size: 3.5rem; color: var(--paper); letter-spacing: 0.02em; line-height: 1; }
+.price-p { font-size: 12px; color: #5a5a50; font-family: var(--mono); }
+.plan-desc { font-size: 13px; color: #7a7a68; line-height: 1.5; margin-bottom: 1.5rem; }
+.plan-features { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 2rem; }
+.plan-features li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #b0b0a0; }
+.pf-check { color: #4ade80; flex-shrink: 0; font-weight: 700; }
+.pf-cross { color: #3a3a34; flex-shrink: 0; }
+.plan-features li.off { color: #3a3a34; }
+.plan-btn { display: block; text-align: center; width: 100%; padding: 12px; border-radius: 3px; font-family: var(--display); font-size: 18px; letter-spacing: 0.08em; text-decoration: none; transition: all 0.2s; border: 1.5px solid #3a3a34; color: #b0b0a0; background: transparent; cursor: pointer; }
+.plan-btn:hover { border-color: var(--paper); color: var(--paper); }
+.plan.featured .plan-btn { background: var(--gate); color: #fff; border-color: var(--gate); box-shadow: 3px 3px 0 rgba(232,57,14,0.3); }
+.plan.featured .plan-btn:hover { background: #fff; color: var(--gate); }
+.pricing-guarantee { text-align: center; margin-top: 2.5rem; }
+.pricing-guarantee p { font-family: var(--mono); font-size: 12px; color: #5a5a50; }
+.pricing-faq { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 3rem; }
+.faq-item h4 { font-size: 14px; font-weight: 700; color: #e0e0d0; margin-bottom: 6px; }
+.faq-item p { font-size: 13px; color: #6a6a58; line-height: 1.6; }
+
+/* TESTIMONIALS */
+.testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 3rem; }
+.testi { background: var(--paper2); border: 1.5px solid var(--paper3); border-radius: 6px; padding: 1.75rem; }
+.t-stars { color: var(--gate); font-size: 14px; margin-bottom: 10px; font-family: var(--mono); letter-spacing: 0.2em; }
+.t-text { font-size: 13px; line-height: 1.65; color: var(--ink2); margin-bottom: 1.25rem; font-style: italic; }
+.t-author { display: flex; align-items: center; gap: 10px; }
+.t-av { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-size: 15px; }
+.t-info .t-name { font-size: 13px; font-weight: 700; }
+.t-info .t-role { font-size: 11px; color: var(--ink3); font-family: var(--mono); }
+
+/* CTA */
+.cta-wrap { background: var(--gate); }
+.cta-inner { max-width: 1100px; margin: 0 auto; padding: 5rem 2rem; text-align: center; }
+.cta-inner h2 { font-family: var(--display); font-size: clamp(3rem,6vw,6rem); letter-spacing: 0.02em; color: #fff; line-height: 0.95; margin-bottom: 1.25rem; }
+.cta-inner p { font-size: 17px; color: rgba(255,255,255,0.8); margin-bottom: 2.5rem; }
+.cta-form { display: flex; gap: 10px; max-width: 460px; margin: 0 auto 1rem; }
+.cta-form input { flex: 1; padding: 13px 18px; border-radius: 3px; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.15); color: #fff; font-family: var(--body); font-size: 14px; outline: none; transition: border-color 0.2s; }
+.cta-form input::placeholder { color: rgba(255,255,255,0.6); }
+.cta-form input:focus { border-color: #fff; }
+.cta-btn { background: var(--ink); color: #fff; padding: 13px 24px; border-radius: 3px; font-family: var(--display); font-size: 20px; letter-spacing: 0.08em; white-space: nowrap; text-decoration: none; transition: all 0.2s; border: 2px solid var(--ink); }
+.cta-btn:hover { background: transparent; color: var(--ink); border-color: var(--ink); }
+.cta-note { font-size: 12px; color: rgba(255,255,255,0.6); font-family: var(--mono); }
+
+/* FOOTER */
+footer { background: var(--ink); padding: 2rem; border-top: 1px solid #2a2a24; }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+.footer-logo { font-family: var(--display); font-size: 22px; letter-spacing: 0.04em; color: var(--paper); text-decoration: none; }
+.footer-logo span { color: var(--gate); }
+.footer-copy { font-size: 12px; color: #4a4a40; font-family: var(--mono); }
+.footer-links { display: flex; gap: 1.5rem; }
+.footer-links a { font-size: 12px; color: #4a4a40; text-decoration: none; font-family: var(--mono); transition: color 0.2s; }
+.footer-links a:hover { color: var(--gate2); }
+hr { border: none; border-top: 1.5px solid var(--paper3); }
+
+@media(max-width:768px){
+  .hero-wrap,.features-layout,.pain-grid,.plans-grid,.testi-grid,.pricing-faq{grid-template-columns:1fr}
+  .hero-visual{display:none}
+  .nav-links{display:none}
+  .footer-inner{flex-direction:column;gap:1rem;text-align:center}
+  .plan.featured{transform:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">PROD<span class="logo-gate">GATE</span></a>
+    <div class="nav-links">
+      <a href="#features">FEATURES</a>
+      <a href="#pricing">PRICING</a>
+      <a href="#testimonials">REVIEWS</a>
+    </div>
+    <a href="#cta" class="nav-cta">OPEN THE GATE</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section>
+  <div class="hero-wrap">
+    <div>
+      <div class="hero-tag"><span class="tag-dot"></span> QA → PROD VERIFICATION TOOL</div>
+      <h1>
+        THE GATE<br/>
+        <span class="accent">BEFORE</span><br/>
+        <span class="line2">PROD.</span>
+      </h1>
+      <p class="hero-sub">
+        Every bug you find on QA <strong>auto-builds a Prod checklist.</strong> When the deploy happens, open ProdGate — tick, verify, ship with confidence. Nothing slips through.
+      </p>
+      <div class="hero-actions">
+        <a href="#cta" class="btn-primary">START FREE TRIAL</a>
+        <a href="#features" class="btn-ghost">See how it works →</a>
+      </div>
+      <div class="hero-proof">
+        <div class="proof-avs">
+          <span class="av1">SR</span><span class="av2">MK</span><span class="av3">PT</span><span class="av4">AK</span><span class="av5">JL</span>
+        </div>
+        <p class="proof-text"><strong>400+ QA testers</strong><br/>replaced sticky notes with ProdGate</p>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="mockup-shell">
+        <div class="mockup-topbar">
+          <span class="mdot mdot-r"></span><span class="mdot mdot-y"></span><span class="mdot mdot-g"></span>
+          <div class="mockup-title-bar">prodgate.io — session: checkout-v2</div>
+        </div>
+        <div class="mockup-tabs">
+          <span class="m-tab active">TEST CASES</span>
+          <span class="m-tab">BUGS (2)</span>
+          <span class="m-tab">PROD GATE</span>
+        </div>
+        <div class="mockup-body">
+          <div class="m-stats">
+            <div class="m-stat"><div class="m-snum c-w">8</div><div class="m-slbl">TOTAL</div></div>
+            <div class="m-stat"><div class="m-snum c-g">5</div><div class="m-slbl">PASS</div></div>
+            <div class="m-stat"><div class="m-snum c-r">2</div><div class="m-slbl">FAIL</div></div>
+            <div class="m-stat"><div class="m-snum c-a">1</div><div class="m-slbl">PEND</div></div>
+          </div>
+          <div class="m-row"><span class="m-icon i-pass">✓</span><span class="m-rtitle">Google OAuth login flow</span><span class="m-badge b-pass">PASSED</span></div>
+          <div class="m-row"><span class="m-icon i-pass">✓</span><span class="m-rtitle">Password reset email</span><span class="m-badge b-pass">PASSED</span></div>
+          <div class="m-row"><span class="m-icon i-fail">✕</span><span class="m-rtitle">CSV upload over 10MB</span><span class="m-badge b-fail">FAILED</span></div>
+          <div class="m-row"><span class="m-icon i-fail">✕</span><span class="m-rtitle">Stripe on Safari browser</span><span class="m-badge b-fail">FAILED</span></div>
+          <div class="m-row"><span class="m-icon i-pend"></span><span class="m-rtitle">Mobile dashboard chart</span><span class="m-badge b-pend">PENDING</span></div>
+          <div class="m-gate-alert">
+            <span class="gate-icon">🔴</span>
+            <div class="gate-text"><strong>PROD GATE: 2 checks pending</strong><br/>Verify CSV fix + Stripe fix on Prod after deploy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STRIP -->
+<div class="strip">
+  <div class="strip-inner">
+    <span class="strip-item">TEST ON QA <span class="strip-sep">///</span></span>
+    <span class="strip-item">LOG THE BUG <span class="strip-sep">///</span></span>
+    <span class="strip-item">DEV FIXES IT <span class="strip-sep">///</span></span>
+    <span class="strip-item">DEPLOY TO PROD <span class="strip-sep">///</span></span>
+    <span class="strip-item">OPEN PRODGATE <span class="strip-sep">///</span></span>
+    <span class="strip-item">VERIFY ✓ <span class="strip-sep">///</span></span>
+    <span class="strip-item">SHIP WITH CONFIDENCE <span class="strip-sep">///</span></span>
+    <span class="strip-item">TEST ON QA <span class="strip-sep">///</span></span>
+    <span class="strip-item">LOG THE BUG <span class="strip-sep">///</span></span>
+    <span class="strip-item">DEV FIXES IT <span class="strip-sep">///</span></span>
+    <span class="strip-item">DEPLOY TO PROD <span class="strip-sep">///</span></span>
+    <span class="strip-item">OPEN PRODGATE <span class="strip-sep">///</span></span>
+    <span class="strip-item">VERIFY ✓ <span class="strip-sep">///</span></span>
+    <span class="strip-item">SHIP WITH CONFIDENCE <span class="strip-sep">///</span></span>
+  </div>
+</div>
+
+<hr />
+
+<!-- PROBLEM -->
+<section>
+  <div class="section">
+    <div class="sec-label">// THE PROBLEM</div>
+    <h2 class="sec-title">YOUR BUGS<br/>ARE ESCAPING.</h2>
+    <p class="sec-sub">You fix it on QA. You forget to check Prod. Your users find it first. Every time.</p>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-num">01</div>
+        <div class="pain-icon">📝</div>
+        <h3>Sticky notes & Notepad</h3>
+        <p>Test cases written somewhere temporary. Lost before the sprint ends. No status, no history, no structure.</p>
+        <div class="pain-quote">"I tested that... I just can't remember what I wrote."</div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-num">02</div>
+        <div class="pain-icon">💬</div>
+        <h3>Bugs buried in Slack</h3>
+        <p>You reported the bug, dev fixed it, deployed to Prod — that thread is now 200 messages deep and 3 days old.</p>
+        <div class="pain-quote">"Was that fix actually pushed to Prod?"</div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-num">03</div>
+        <div class="pain-icon">🙈</div>
+        <h3>The Prod verification gap</h3>
+        <p>QA passes. Dev says it's deployed. You move on. A user finds the same bug on Prod two weeks later.</p>
+        <div class="pain-quote">"It worked on QA. Why didn't anyone check Prod?!"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr />
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section">
+    <div class="sec-label">// HOW IT WORKS</div>
+    <h2 class="sec-title">ONE FLOW.<br/>ZERO GAPS.</h2>
+    <p class="sec-sub">ProdGate connects your test cases, bug logs, and Prod verification in one locked-down workflow.</p>
+    <div class="features-layout">
+      <div>
+        <div class="feature-item">
+          <div class="feat-num">01</div>
+          <div class="feat-body">
+            <h4>Test Case Tracker</h4>
+            <p>Add every test case before you start. Mark Pass / Fail / Blocked live. Attach screenshots, add notes. Way better than Notepad.</p>
+            <span class="feat-badge fb-core">CORE FEATURE</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feat-num">02</div>
+          <div class="feat-body">
+            <h4>Bug Logger + Screenshots</h4>
+            <p>Log a bug, attach a screenshot directly, set severity. No more hunting through Slack to find what you reported 3 days ago.</p>
+            <span class="feat-badge fb-core">CORE FEATURE</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feat-num">03</div>
+          <div class="feat-body">
+            <h4>Auto Prod Gate Checklist</h4>
+            <p>Every QA bug you log automatically appears as a Prod verification item. When deploy happens — open ProdGate, tick each fix, done.</p>
+            <span class="feat-badge fb-new">THE KEY FEATURE</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feat-num">04</div>
+          <div class="feat-body">
+            <h4>Slack Integration</h4>
+            <p>Log a bug → auto-posts to Slack. Dev marks it fixed → you get notified to verify on Prod. The loop closes itself.</p>
+            <span class="feat-badge fb-new">TEAM PLAN</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feat-num">05</div>
+          <div class="feat-body">
+            <h4>PDF/CSV Export</h4>
+            <p>One-click test run report for clients. Professional QA sign-off in seconds.</p>
+            <span class="feat-badge fb-core">ALL PLANS</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="gate-box">
+          <h3>THE PROD<br/><span>GATE</span></h3>
+          <p>Your safety net between every QA run and every production deploy. Auto-built from your bug log — zero extra work.</p>
+          <div class="gate-flow">
+            <div class="gf-step"><span class="gf-num">1</span><span class="gf-text">Find bug on QA → log it in ProdGate</span></div>
+            <div class="gf-step"><span class="gf-num">2</span><span class="gf-text">Bug auto-appears in Prod Gate checklist</span></div>
+            <div class="gf-step"><span class="gf-num">3</span><span class="gf-text">Dev fixes + deploys → you get notified</span></div>
+            <div class="gf-step"><span class="gf-num">4</span><span class="gf-text">Open checklist → verify each fix on Prod</span></div>
+            <div class="gf-step"><span class="gf-num">5</span><span class="gf-text">Gate = 100% ✓ → ship with confidence</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<hr />
+<section id="testimonials">
+  <div class="section">
+    <div class="sec-label">// EARLY USERS</div>
+    <h2 class="sec-title">TESTERS WHO<br/>DITCHED NOTEPAD.</h2>
+    <div class="testi-grid">
+      <div class="testi">
+        <div class="t-stars">★★★★★</div>
+        <p class="t-text">"The Prod Gate checklist alone has saved me from shipping 3 broken fixes. I used to have 6 sticky notes and a Notion doc open at once. ProdGate is the only tab I need."</p>
+        <div class="t-author">
+          <div class="t-av" style="background:#e2d4f5;color:#6a3db5">SR</div>
+          <div class="t-info"><div class="t-name">Sarah R.</div><div class="t-role">QA Lead · Austin TX</div></div>
+        </div>
+      </div>
+      <div class="testi">
+        <div class="t-stars">★★★★★</div>
+        <p class="t-text">"Our dev is remote. Bugs lived in Slack — we'd always lose track. Now the Slack notification fires automatically, dev marks it fixed, I get pinged to verify Prod. Huge game-changer."</p>
+        <div class="t-author">
+          <div class="t-av" style="background:#d4e8f5;color:#1a5a8a">MK</div>
+          <div class="t-info"><div class="t-name">Marcus K.</div><div class="t-role">Freelance QA · Chicago IL</div></div>
+        </div>
+      </div>
+      <div class="testi">
+        <div class="t-stars">★★★★☆</div>
+        <p class="t-text">"Finally something between Notepad and Jira. Jira is overkill for a 3-person team. ProdGate is exactly right-sized. Screenshot attachment on bug logs is everything."</p>
+        <div class="t-author">
+          <div class="t-av" style="background:#f5d4d4;color:#8a1a1a">PT</div>
+          <div class="t-info"><div class="t-name">Priya T.</div><div class="t-role">Full-stack dev (solo QA) · NYC</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="pricing-inner">
+    <div class="sec-label">// PRICING</div>
+    <h2 class="sec-title">SIMPLE.<br/>TRANSPARENT.</h2>
+    <p class="sec-sub">Start free. Upgrade when your team grows. No surprises.</p>
+    <div class="pricing-toggle">
+      <span class="tgl-label">MONTHLY</span>
+      <button class="tgl-btn" id="tgl" onclick="toggleBilling()"><span class="tgl-knob"></span></button>
+      <span class="tgl-label">ANNUAL <span class="save-pill">SAVE 25%</span></span>
+    </div>
+    <div class="plans-grid">
+      <div class="plan">
+        <div class="plan-name">// SOLO</div>
+        <div class="plan-price"><span class="price-n" id="p-solo">$9</span><span class="price-p">/month</span></div>
+        <p class="plan-desc">Freelancers & solo testers who need a real system.</p>
+        <ul class="plan-features">
+          <li><span class="pf-check">✓</span> Unlimited test cases</li>
+          <li><span class="pf-check">✓</span> Bug log + screenshot</li>
+          <li><span class="pf-check">✓</span> Prod Gate checklist</li>
+          <li><span class="pf-check">✓</span> 3 active projects</li>
+          <li><span class="pf-check">✓</span> PDF / CSV export</li>
+          <li class="off"><span class="pf-cross">✕</span> Slack integration</li>
+          <li class="off"><span class="pf-cross">✕</span> Team members</li>
+        </ul>
+        <a href="#cta" class="plan-btn">START FREE TRIAL</a>
+      </div>
+      <div class="plan featured">
+        <div class="plan-hot">MOST POPULAR</div>
+        <div class="plan-name">// TEAM</div>
+        <div class="plan-price"><span class="price-n" id="p-team">$29</span><span class="price-p">/month</span></div>
+        <p class="plan-desc">Small dev + QA teams who want everyone aligned.</p>
+        <ul class="plan-features">
+          <li><span class="pf-check">✓</span> Everything in Solo</li>
+          <li><span class="pf-check">✓</span> Up to 5 team members</li>
+          <li><span class="pf-check">✓</span> Slack integration</li>
+          <li><span class="pf-check">✓</span> Unlimited projects</li>
+          <li><span class="pf-check">✓</span> Dev notifications</li>
+          <li><span class="pf-check">✓</span> Deploy webhooks</li>
+          <li><span class="pf-check">✓</span> Priority support</li>
+        </ul>
+        <a href="#cta" class="plan-btn">START FREE TRIAL</a>
+      </div>
+      <div class="plan">
+        <div class="plan-name">// AGENCY</div>
+        <div class="plan-price"><span class="price-n" id="p-agency">$79</span><span class="price-p">/month</span></div>
+        <p class="plan-desc">Agencies managing QA across multiple client projects.</p>
+        <ul class="plan-features">
+          <li><span class="pf-check">✓</span> Everything in Team</li>
+          <li><span class="pf-check">✓</span> Unlimited members</li>
+          <li><span class="pf-check">✓</span> Client-branded reports</li>
+          <li><span class="pf-check">✓</span> Client portal (read-only)</li>
+          <li><span class="pf-check">✓</span> Custom webhooks</li>
+          <li><span class="pf-check">✓</span> Jira / Linear sync</li>
+          <li><span class="pf-check">✓</span> Dedicated onboarding</li>
+        </ul>
+        <a href="#cta" class="plan-btn">START FREE TRIAL</a>
+      </div>
+    </div>
+    <div class="pricing-guarantee"><p>// 14-DAY FREE TRIAL · NO CREDIT CARD · CANCEL ANYTIME</p></div>
+    <div class="pricing-faq">
+      <div class="faq-item"><h4>What counts as a project?</h4><p>One feature, sprint, or bug fix cycle you're testing. Solo = 3 active projects. Team & Agency = unlimited.</p></div>
+      <div class="faq-item"><h4>Can I import from Jira or Notion?</h4><p>Agency plan includes Jira + Linear sync. Solo & Team support CSV import for test cases.</p></div>
+      <div class="faq-item"><h4>What happens after the trial?</h4><p>Your data stays safe. Free tier available (1 project limit). No auto-charge without consent.</p></div>
+      <div class="faq-item"><h4>Startup discount?</h4><p>Pre-revenue or under 6 months old? Email us for 50% off year one. We grow with you.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-wrap" id="cta">
+  <div class="cta-inner">
+    <h2>OPEN THE<br/>GATE.</h2>
+    <p>Join 400+ testers who replaced sticky notes with a system that ships clean.</p>
+    <div class="cta-form">
+      <input type="email" placeholder="your@email.com" />
+      <a href="#" class="cta-btn">GET ACCESS</a>
+    </div>
+    <p class="cta-note">// FREE 14-DAY TRIAL · 30-SECOND SETUP · NO CREDIT CARD</p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <a href="#" class="footer-logo">PROD<span>GATE</span></a>
+    <span class="footer-copy">© 2025 ProdGate · Built for testers, by a tester.</span>
+    <div class="footer-links">
+      <a href="#">PRIVACY</a><a href="#">TERMS</a><a href="#">SUPPORT</a><a href="mailto:hi@prodgate.io">hi@prodgate.io</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+var annual = false;
+function toggleBilling() {
+  annual = !annual;
+  document.getElementById('tgl').classList.toggle('on', annual);
+  document.getElementById('p-solo').textContent = annual ? '$7' : '$9';
+  document.getElementById('p-team').textContent = annual ? '$22' : '$29';
+  document.getElementById('p-agency').textContent = annual ? '$59' : '$79';
+  document.querySelectorAll('.price-p').forEach(function(el){ el.textContent = annual ? '/mo, billed annually' : '/month'; });
+}
+</script>
+</body>
+</html>
