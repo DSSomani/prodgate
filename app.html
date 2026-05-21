@@ -60,6 +60,17 @@ body{font-family:var(--body);background:var(--bg);color:var(--paper);font-size:1
 .project-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .add-project{margin:4px 8px;padding:6px 10px;border-radius:var(--r);font-size:11px;color:#4a4a40;cursor:pointer;border:1px dashed var(--border);text-align:center;font-family:var(--mono);transition:all 0.15s}
 .add-project:hover{border-color:var(--gate);color:var(--gate2)}
+.project-delete{display:none;margin-left:auto;background:none;border:none;cursor:pointer;font-size:11px;padding:0 2px;color:#4a4a40;line-height:1}
+.project-item:hover .project-delete{display:inline}
+.project-delete:hover{color:var(--red)!important}
+.issue-item{padding:5px 10px 5px 22px;border-radius:var(--r);font-size:11px;color:#5a5a50;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.15s;font-family:var(--mono);margin-bottom:1px}
+.issue-item:hover{background:var(--bg3);color:var(--paper2)}
+.issue-item.active{background:var(--bg3);color:var(--gate2)}
+.issue-delete{display:none;margin-left:auto;background:none;border:none;cursor:pointer;font-size:11px;padding:0 2px;color:#4a4a40}
+.issue-item:hover .issue-delete{display:inline}
+.issue-delete:hover{color:var(--red)!important}
+.add-issue{margin:2px 8px 4px 20px;padding:4px 8px;border-radius:var(--r);font-size:10px;color:#3a3a34;cursor:pointer;border:1px dashed var(--border);text-align:center;font-family:var(--mono);transition:all 0.15s}
+.add-issue:hover{border-color:var(--gate);color:var(--gate2)}
 
 /* MAIN */
 .main{flex:1;overflow:hidden;display:flex;flex-direction:column}
@@ -276,12 +287,9 @@ input[type=file]{display:none}
               <input type="text" id="tc-title" placeholder="What are you testing?" />
             </div>
             <div class="field-group">
-              <div class="form-label">Area / Module</div>
+              <div class="form-label" style="display:flex;align-items:center;justify-content:space-between">Area / Module <span onclick="openAreaModal()" style="cursor:pointer;color:#4a4a40;font-size:11px" title="Manage areas">⚙</span></div>
               <select id="tc-area">
                 <option value="">Select area...</option>
-                <option>Login / Auth</option><option>Dashboard</option><option>Settings</option>
-                <option>Payments</option><option>API</option><option>UI / Layout</option>
-                <option>Mobile</option><option>Email</option><option>Other</option>
               </select>
             </div>
             <div class="field-group">
@@ -390,6 +398,21 @@ input[type=file]{display:none}
   </div>
 </div>
 
+<!-- AREA MODAL -->
+<div class="modal-overlay hidden" id="area-modal">
+  <div class="modal">
+    <h3>MANAGE <span>AREAS</span></h3>
+    <div id="area-list-modal" style="max-height:200px;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column;gap:4px"></div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="area-input" placeholder="New area name..." style="flex:1" onkeydown="if(event.key==='Enter')addArea()" />
+      <button class="primary" onclick="addArea()">+ Add</button>
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeAreaModal()">Done</button>
+    </div>
+  </div>
+</div>
+
 <!-- IMG PREVIEW -->
 <div class="img-preview-overlay hidden" id="img-preview" onclick="closeImgPreview()">
   <img id="img-preview-src" src="" alt="Screenshot preview" />
@@ -402,15 +425,18 @@ input[type=file]{display:none}
 var S = {
   session: 'New Session',
   activeProject: 'default',
+  activeIssue: null,
   projects: [{id:'default',name:'Main Project',color:'#e8390e'}],
+  issues: [],
   tests: [],
   bugs: [],
   gateItems: [],
+  areas: ['Login / Auth','Dashboard','Settings','Payments','API','UI / Layout','Mobile','Email','Other'],
   openTc: null
 };
 
 function save(){try{localStorage.setItem('prodgate_mvp',JSON.stringify(S))}catch(e){}}
-function load(){try{var d=localStorage.getItem('prodgate_mvp');if(d)S=Object.assign(S,JSON.parse(d))}catch(e){}}
+function load(){try{var d=localStorage.getItem('prodgate_mvp');if(d){S=Object.assign(S,JSON.parse(d));if(!Array.isArray(S.areas)||!S.areas.length)S.areas=['Login / Auth','Dashboard','Settings','Payments','API','UI / Layout','Mobile','Email','Other'];if(!Array.isArray(S.issues))S.issues=[];if(S.activeIssue===undefined)S.activeIssue=null;}}catch(e){}}
 load();
 
 // UTILS
@@ -434,19 +460,63 @@ function saveSession(){
 // PROJECTS
 function renderProjects(){
   var el=document.getElementById('projects-list');
-  el.innerHTML=S.projects.map(function(p){
-    return '<div class="project-item'+(p.id===S.activeProject?' active':'')+'" onclick="setProject(\''+p.id+'\')">'
+  var html='';
+  S.projects.forEach(function(p){
+    var isActive=p.id===S.activeProject;
+    html+='<div class="project-item'+(isActive?' active':'')+'" onclick="setProject(\''+p.id+'\')">'
       +'<span class="project-dot" style="background:'+p.color+'"></span>'
-      +esc(p.name)+'</div>';
-  }).join('');
+      +esc(p.name)
+      +'<button class="project-delete" onclick="event.stopPropagation();deleteProject(\''+p.id+'\')">🗑</button>'
+      +'</div>';
+    if(isActive){
+      var issues=S.issues.filter(function(i){return i.project===p.id});
+      issues.forEach(function(issue){
+        html+='<div class="issue-item'+(issue.id===S.activeIssue?' active':'')+'" onclick="setIssue(\''+issue.id+'\')">'
+          +'<span style="color:#4a4a40;font-size:9px">▸</span>'
+          +esc(issue.name)
+          +'<button class="issue-delete" onclick="event.stopPropagation();deleteIssue(\''+issue.id+'\')">🗑</button>'
+          +'</div>';
+      });
+      html+='<div class="add-issue" onclick="addIssue()">+ New Issue</div>';
+    }
+  });
+  el.innerHTML=html;
 }
-function setProject(id){S.activeProject=id;save();renderProjects();}
+function setProject(id){S.activeProject=id;S.activeIssue=null;save();renderProjects();renderTests();}
+function deleteProject(id){
+  if(S.projects.length<=1){toast('Cannot delete the last project');return;}
+  if(!confirm('Delete this project and all its data?'))return;
+  S.projects=S.projects.filter(function(p){return p.id!==id});
+  S.issues=S.issues.filter(function(i){return i.project!==id});
+  S.tests=S.tests.filter(function(t){return t.project!==id});
+  S.bugs=S.bugs.filter(function(b){return b.project!==id});
+  if(S.activeProject===id){S.activeProject=S.projects[0].id;S.activeIssue=null;}
+  save();renderProjects();renderTests();renderBugs();renderGate();updateStats();
+}
 function addProject(){
   var name=prompt('Project name:');if(!name)return;
   var colors=['#e8390e','#4ade80','#60a5fa','#fbbf24','#c084fc','#f472b6'];
   var color=colors[S.projects.length%colors.length];
   S.projects.push({id:uid(),name:name,color:color});
   save();renderProjects();
+}
+function addIssue(){
+  var name=prompt('Issue name:');if(!name)return;
+  var issue={id:uid(),name:name,project:S.activeProject};
+  S.issues.push(issue);
+  S.activeIssue=issue.id;
+  save();renderProjects();renderTests();
+}
+function setIssue(id){
+  S.activeIssue=(S.activeIssue===id)?null:id;
+  save();renderProjects();renderTests();
+}
+function deleteIssue(id){
+  if(!confirm('Delete this issue and all its test cases?'))return;
+  S.issues=S.issues.filter(function(i){return i.id!==id});
+  S.tests=S.tests.filter(function(t){return t.issue!==id});
+  if(S.activeIssue===id)S.activeIssue=null;
+  save();renderProjects();renderTests();updateStats();
 }
 renderProjects();
 
@@ -481,6 +551,38 @@ function updateStats(){
   gEl.style.display=gateLeft>0?'':'none';
 }
 
+// AREA MANAGEMENT
+function renderAreaSelect(){
+  var sel=document.getElementById('tc-area');
+  var cur=sel.value;
+  sel.innerHTML='<option value="">Select area...</option>'
+    +S.areas.map(function(a){return '<option value="'+esc(a)+'"'+(a===cur?' selected':'')+'>'+esc(a)+'</option>';}).join('');
+}
+function openAreaModal(){renderAreaModal();document.getElementById('area-modal').classList.remove('hidden');}
+function closeAreaModal(){document.getElementById('area-modal').classList.add('hidden');}
+function renderAreaModal(){
+  var el=document.getElementById('area-list-modal');
+  el.innerHTML=S.areas.map(function(a,i){
+    return '<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border)">'
+      +'<span style="flex:1;font-family:var(--mono);font-size:12px;color:var(--paper2)">'+esc(a)+'</span>'
+      +'<button class="sm danger" onclick="deleteArea('+i+')">🗑</button>'
+      +'</div>';
+  }).join('');
+}
+function addArea(){
+  var v=document.getElementById('area-input').value.trim();
+  if(!v)return;
+  if(S.areas.indexOf(v)>=0){toast('Area already exists');return;}
+  S.areas.push(v);
+  document.getElementById('area-input').value='';
+  save();renderAreaModal();renderAreaSelect();toast('Area added ✓');
+}
+function deleteArea(i){
+  if(S.areas.length<=1){toast('Keep at least one area');return;}
+  S.areas.splice(i,1);
+  save();renderAreaModal();renderAreaSelect();
+}
+
 // TEST CASES
 function addTestCase(){
   var title=document.getElementById('tc-title').value.trim();
@@ -492,7 +594,8 @@ function addTestCase(){
     steps:document.getElementById('tc-steps').value.trim(),
     status:'pending',note:'',
     created:new Date().toLocaleString(),
-    project:S.activeProject
+    project:S.activeProject,
+    issue:S.activeIssue
   });
   ['tc-title','tc-steps'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('tc-area').value='';
@@ -518,13 +621,17 @@ function toggleTc(id){S.openTc=S.openTc===id?null:id;renderTests();}
 function renderTests(){
   updateStats();
   var el=document.getElementById('tc-list');
-  if(S.tests.length===0){
-    el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No test cases yet.<br/>Add one above to get started.</div></div>';
+  var visible=S.activeIssue
+    ?S.tests.filter(function(t){return t.issue===S.activeIssue})
+    :S.tests;
+  if(visible.length===0){
+    var msg=S.activeIssue?'No test cases in this issue.<br/>Add one above.':'No test cases yet.<br/>Add one above to get started.';
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">'+msg+'</div></div>';
     return;
   }
   var pMap={pending:'sp-pending',pass:'sp-pass',fail:'sp-fail',blocked:'sp-blocked'};
   var cMap={pass:'✓',fail:'✕',blocked:'—'};
-  el.innerHTML=S.tests.map(function(tc){
+  el.innerHTML=visible.map(function(tc){
     var open=S.openTc===tc.id;
     var pc=pMap[tc.status]||'sp-pending';
     var cc=cMap[tc.status]||'';
@@ -724,8 +831,10 @@ function deleteGateItem(id){
 function renderGate(){
   var auto=S.gateItems.filter(function(x){return x.auto});
   var manual=S.gateItems.filter(function(x){return !x.auto});
-  var total=S.gateItems.length;
-  var done=S.gateItems.filter(function(x){return x.checked}).length;
+  var tcTotal=S.tests.length;
+  var tcDone=S.tests.filter(function(t){return t.status==='pass'}).length;
+  var total=S.gateItems.length+tcTotal;
+  var done=S.gateItems.filter(function(x){return x.checked}).length+tcDone;
   var pct=total?Math.round(done/total*100):0;
   document.getElementById('gate-progress-fill').style.width=pct+'%';
   document.getElementById('gate-progress-fill').classList.toggle('done',pct===100);
@@ -761,8 +870,28 @@ function renderGate(){
       +'</div>';
     }).join('')
   :'';
-  el.innerHTML='<div class="gate-sections">'+fromBugs+fromManual+'</div>';
+  var pMap={pending:'sp-pending',pass:'sp-pass',fail:'sp-fail',blocked:'sp-blocked'};
+  var fromTests=S.tests.length?
+    '<div class="gate-section-label">✅ TEST CASES</div>'
+    +S.tests.map(function(tc){
+      var issue=tc.issue?S.issues.find(function(i){return i.id===tc.issue}):null;
+      var isPass=tc.status==='pass';
+      var stTag=pMap[tc.status]||'sp-pending';
+      return '<div class="gate-item'+(isPass?' checked':'')+'" onclick="toggleGateTc(\''+tc.id+'\')">'
+        +'<div class="gi-box">'+(isPass?'✓':'')+'</div>'
+        +'<span class="gi-label">'+esc(tc.title)+'</span>'
+        +(issue?'<span class="gi-source">'+esc(issue.name)+'</span>':'')
+        +(tc.area?'<span class="tc-area">'+esc(tc.area)+'</span>':'')
+        +'<span class="status-pill '+stTag+'">'+tc.status.toUpperCase()+'</span>'
+      +'</div>';
+    }).join('')
+  :'';
+  el.innerHTML='<div class="gate-sections">'+fromTests+fromBugs+fromManual+'</div>';
   updateStats();
+}
+function toggleGateTc(id){
+  var tc=S.tests.find(function(t){return t.id===id});
+  if(tc){tc.status=tc.status==='pass'?'pending':'pass';save();renderGate();renderTests();updateStats();}
 }
 
 // IMG PREVIEW
@@ -775,12 +904,12 @@ function closeImgPreview(){document.getElementById('img-preview').classList.add(
 // KEYBOARD
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
-    closeSessionModal();closeImgPreview();
+    closeSessionModal();closeImgPreview();closeAreaModal();
   }
 });
 
 // INIT
-renderTests();renderBugs();renderGate();updateStats();
+renderAreaSelect();renderTests();renderBugs();renderGate();updateStats();
 </script>
 </body>
 </html>
