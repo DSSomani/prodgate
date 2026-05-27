@@ -532,7 +532,7 @@ hr { border: none; border-top: 1.5px solid var(--paper3); }
       <input type="email" id="waitlist-email" placeholder="your@email.com" required />
       <button type="submit" class="cta-btn">NOTIFY ME</button>
     </form>
-    <p class="cta-note" id="waitlist-msg">// FREE AT LAUNCH · NO SPAM · UNSUBSCRIBE ANYTIME</p>
+    <p class="cta-note" id="waitlist-msg">// FREE AT LAUNCH · NO SPAM · <a href="privacy.html" style="color:rgba(255,255,255,0.6);text-decoration:underline">PRIVACY POLICY</a></p>
   </div>
 </div>
 
@@ -541,20 +541,43 @@ hr { border: none; border-top: 1.5px solid var(--paper3); }
     <a href="#" class="footer-logo">PROD<span>GATE</span></a>
     <span class="footer-copy">© 2025 ProdGate · Built for testers, by a tester.</span>
     <div class="footer-links">
-      <a href="#">PRIVACY</a><a href="#">TERMS</a><a href="#">SUPPORT</a><a href="mailto:hi@prodgate.io">hi@prodgate.io</a>
+      <a href="privacy.html">PRIVACY</a><a href="#">TERMS</a><a href="#">SUPPORT</a><a href="mailto:hi@prodgate.io">hi@prodgate.io</a>
     </div>
   </div>
 </footer>
 
 <script>
+// Replace this with your deployed Google Apps Script web app URL
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzh721Zn7b5lkafB00r_BmlQxVnPSq66RxhyYWQl1CkK_qSYUu22wIoJ5PyL_bqgtj57w/exec';
+
 function handleWaitlist(e) {
   e.preventDefault();
   var email = document.getElementById('waitlist-email').value.trim();
   if (!email) return;
-  document.getElementById('waitlist-form').style.display = 'none';
-  document.getElementById('waitlist-msg').textContent = '// ✓ YOU\'RE ON THE LIST — WE\'LL EMAIL ' + email.toUpperCase() + ' WHEN WE LAUNCH';
-  document.getElementById('waitlist-msg').style.opacity = '1';
-  document.getElementById('waitlist-msg').style.fontSize = '13px';
+
+  var btn = e.target.querySelector('button');
+  var msg = document.getElementById('waitlist-msg');
+  btn.textContent = 'SENDING...';
+  btn.disabled = true;
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, timestamp: new Date().toISOString() })
+  })
+  .then(function() {
+    document.getElementById('waitlist-form').style.display = 'none';
+    msg.textContent = '// ✓ YOU\'RE ON THE LIST — WE\'LL EMAIL ' + email.toUpperCase() + ' WHEN WE LAUNCH';
+    msg.style.opacity = '1';
+    msg.style.fontSize = '13px';
+  })
+  .catch(function() {
+    btn.textContent = 'NOTIFY ME';
+    btn.disabled = false;
+    msg.textContent = '// ✕ SOMETHING WENT WRONG — PLEASE TRY AGAIN';
+    msg.style.color = '#ffaaaa';
+  });
 }
 
 var annual = false;
