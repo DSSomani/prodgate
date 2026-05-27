@@ -220,7 +220,6 @@ input[type=file]{display:none}
 .gi-st-fixed{background:var(--green-bg);color:var(--green)}
 .gi-st-open{background:var(--blue-bg);color:var(--blue)}
 .gate-empty{text-align:center;padding:3rem;color:#4a4a40;font-family:var(--mono);font-size:12px;line-height:2}
-.gate-empty-icon{font-size:2.5rem;margin-bottom:0.75rem}
 
 .modal-overlay,.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
 .modal-overlay.hidden,.overlay.hidden{display:none}
@@ -257,8 +256,9 @@ input[type=file]{display:none}
 
 /* EMPTY */
 .empty-state{text-align:center;padding:3rem 1rem;color:#4a4a40}
-.empty-icon{font-size:2.5rem;margin-bottom:0.75rem}
+.empty-icon{margin-bottom:0.75rem;display:flex;justify-content:center}
 .empty-text{font-family:var(--mono);font-size:12px;line-height:1.8}
+.gate-empty-icon{margin-bottom:0.75rem;display:flex;justify-content:center}
 </style>
 </head>
 <body>
@@ -278,7 +278,8 @@ input[type=file]{display:none}
     <div class="stat-chip"><span class="sc-num sc-a" id="s-bugs">0</span><span style="color:#4a4a40">BUGS</span></div>
   </div>
   <div class="topbar-right">
-    <button class="topbar-btn" onclick="switchTab('gate')">🔴 PROD GATE</button>
+    <button class="topbar-btn" onclick="switchTab('gate')">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="vertical-align:middle;margin-right:5px"><circle cx="6" cy="6" r="5" fill="#fff" opacity="0.25"/><circle cx="6" cy="6" r="3" fill="#fff"/></svg>PROD GATE</button>
   </div>
 </div>
 
@@ -289,9 +290,9 @@ input[type=file]{display:none}
   <div class="sidebar">
     <div class="sidebar-top">
       <div class="sidebar-label">Views</div>
-      <div class="nav-item active" id="nav-tests" onclick="switchTab('tests')"><span class="nav-icon">✅</span> Test Cases</div>
-      <div class="nav-item" id="nav-bugs" onclick="switchTab('bugs')"><span class="nav-icon">🐛</span> Bugs <span class="nav-badge" id="bug-nav-badge" style="display:none">0</span></div>
-      <div class="nav-item" id="nav-gate" onclick="switchTab('gate')"><span class="nav-icon">🔴</span> Prod Gate</div>
+      <div class="nav-item active" id="nav-tests" onclick="switchTab('tests')"><span class="nav-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M4 7l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Test Cases</div>
+      <div class="nav-item" id="nav-bugs" onclick="switchTab('bugs')"><span class="nav-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="8" r="3.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 4.5C5.5 3.67 6.17 3 7 3s1.5.67 1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M2 6.5h1.5M10.5 6.5H12M2 9.5h1.5M10.5 9.5H12M7 11.5V13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span> Bugs <span class="nav-badge" id="bug-nav-badge" style="display:none">0</span></div>
+      <div class="nav-item" id="nav-gate" onclick="switchTab('gate')"><span class="nav-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12V5l5-3 5 3v7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="4.5" y="7" width="2" height="3" rx="0.5" stroke="currentColor" stroke-width="1.2"/><rect x="7.5" y="7" width="2" height="3" rx="0.5" stroke="currentColor" stroke-width="1.2"/></svg></span> Prod Gate</div>
     </div>
     <div class="sidebar-tree" id="sidebar-tree"></div>
   </div>
@@ -300,13 +301,13 @@ input[type=file]{display:none}
   <div class="main">
     <div class="tab-bar">
       <div class="tab active" id="tab-tests" onclick="switchTab('tests')">
-        <span>✅</span> TEST CASES
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M4 7l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> TEST CASES
       </div>
       <div class="tab" id="tab-bugs" onclick="switchTab('bugs')">
-        <span>🐛</span> BUGS <span class="tab-badge" id="bug-tab-badge" style="display:none">0</span>
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="8" r="3.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 4.5C5.5 3.67 6.17 3 7 3s1.5.67 1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M2 6.5h1.5M10.5 6.5H12M2 9.5h1.5M10.5 9.5H12M7 11.5V13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> BUGS <span class="tab-badge" id="bug-tab-badge" style="display:none">0</span>
       </div>
       <div class="tab" id="tab-gate" onclick="switchTab('gate')">
-        <span>🔴</span> PROD GATE <span class="tab-badge" id="gate-tab-badge" style="display:none">0</span>
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 12V5l5-3 5 3v7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="4.5" y="7" width="2" height="3" rx="0.5" stroke="currentColor" stroke-width="1.2"/><rect x="7.5" y="7" width="2" height="3" rx="0.5" stroke="currentColor" stroke-width="1.2"/></svg> PROD GATE <span class="tab-badge" id="gate-tab-badge" style="display:none">0</span>
       </div>
     </div>
 
@@ -321,7 +322,7 @@ input[type=file]{display:none}
     <div class="panel active" id="panel-tests">
       <div class="panel-content">
         <div id="tests-no-ctx" class="no-context" style="display:none">
-          <div style="font-size:2rem;margin-bottom:0.75rem">📁</div>
+          <div style="margin-bottom:0.75rem"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="opacity:0.3"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" stroke="currentColor" stroke-width="1.5"/></svg></div>
           Select a <strong style="color:var(--gate2)">Project → Issue</strong> from the sidebar<br/>to view or add test cases.
         </div>
         <div id="tests-ctx">
@@ -332,7 +333,7 @@ input[type=file]{display:none}
               <input type="text" id="tc-title" placeholder="What are you testing?" />
             </div>
             <div class="field-group">
-              <div class="form-label" style="display:flex;align-items:center;justify-content:space-between">Area / Module <span onclick="openAreaModal()" style="cursor:pointer;color:#4a4a40;font-size:11px" title="Manage areas">⚙</span></div>
+              <div class="form-label" style="display:flex;align-items:center;justify-content:space-between">Area / Module <span onclick="openAreaModal()" style="cursor:pointer;color:#4a4a40;display:inline-flex;align-items:center" title="Manage areas"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg></span></div>
               <select id="tc-area">
                 <option value="">Select area...</option>
               </select>
@@ -399,7 +400,7 @@ input[type=file]{display:none}
           </div>
           <div class="form-actions">
             <label style="font-size:12px;color:#6a6a58;cursor:pointer;display:flex;align-items:center;gap:5px;margin-right:auto">
-              📎 <span id="img-count-label">Attach screenshot</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66L9.41 17.41a2 2 0 01-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> <span id="img-count-label">Attach screenshot</span>
               <input type="file" id="bug-img-input" accept="image/*" multiple onchange="handleImgAttach(this)" />
             </label>
             <button class="primary" onclick="addBug()">+ LOG BUG</button>
@@ -536,6 +537,7 @@ function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
 function openModal(id){document.getElementById(id).classList.remove('hidden')}
 function closeModal(id){document.getElementById(id).classList.add('hidden')}
+function openAreaModal(){renderAreaModal();openModal('area-modal');}
 var _confirmAction=null;
 function openConfirmModal(title,message,confirmText,onConfirm){
   _confirmAction=onConfirm||null;
@@ -610,8 +612,8 @@ function renderSidebar(){
       +'<span class="proj-dot" style="background:'+proj.color+'"></span>'
       +'<span class="proj-name">'+esc(proj.name)+'</span>'
       +'<div class="proj-actions">'
-        +'<button class="proj-btn" onclick="event.stopPropagation();editProj(\''+proj.id+'\')" title="Rename">✏</button>'
-        +'<button class="proj-btn del" onclick="event.stopPropagation();deleteProj(\''+proj.id+'\')" title="Delete">🗑</button>'
+        +'<button class="proj-btn" onclick="event.stopPropagation();editProj(\''+proj.id+'\')" title="Rename"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>'
+        +'<button class="proj-btn del" onclick="event.stopPropagation();deleteProj(\''+proj.id+'\')" title="Delete"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 11v6M14 11v6M9 6V4h6v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>'
       +'</div>'
     +'</div>';
     if(proj.open){
@@ -620,11 +622,11 @@ function renderSidebar(){
       projIssues.forEach(function(issue){
         var tc=S.tests.filter(function(t){return t.issueId===issue.id}).length;
         html+='<div class="issue-row'+(issue.id===S.activeIssue?' active-issue':'')+'" onclick="selectIssue(\''+issue.id+'\')">'
-          +'<span class="issue-icon">📋</span>'
+          +'<span class="issue-icon"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 8h10M7 12h10M7 16h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>'
           +'<span class="issue-name">'+esc(issue.name)+'</span>'
           +'<span class="issue-tc-count">'+tc+'</span>'
           +'<div class="issue-actions">'
-            +'<button class="proj-btn del" onclick="event.stopPropagation();deleteIssue(\''+issue.id+'\')" title="Delete">🗑</button>'
+            +'<button class="proj-btn del" onclick="event.stopPropagation();deleteIssue(\''+issue.id+'\')" title="Delete"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 11v6M14 11v6M9 6V4h6v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>'
           +'</div>'
         +'</div>';
       });
@@ -796,7 +798,7 @@ function deleteTc(id){
 function saveTcNote(id){
   var tc=S.tests.find(function(t){return t.id===id});
   var el=document.getElementById('tcn_'+id);
-  if(tc&&el){tc.note=el.value;save();}
+  if(tc&&el){tc.note=el.value;save();setTimeout(function(){renderTests();},0);}
 }
 function toggleTc(id){S.openTc=S.openTc===id?null:id;renderTests();}
 
@@ -809,7 +811,7 @@ function renderTests(){
   var list=document.getElementById('tc-list');
   var tests=S.tests.filter(function(t){return t.issueId===S.activeIssue});
   if(!tests.length){
-    list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No test cases for this issue yet.<br/>Add one above.</div></div>';
+    list.innerHTML='<div class="empty-state"><div class="empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" style="opacity:0.25"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 8h10M7 12h10M7 16h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="empty-text">No test cases for this issue yet.<br/>Add one above.</div></div>';
     updateStats();return;
   }
   var scMap={pending:'sp-pending',pass:'sp-pass',fail:'sp-fail',blocked:'sp-blocked'};
@@ -835,7 +837,7 @@ function renderTests(){
               +'<button class="sm" style="color:var(--amber);border-color:var(--amber-bg)" onclick="setTcStatus(\''+tc.id+'\',\'blocked\')">— BLOCKED</button>'
               +'<button class="sm" onclick="setTcStatus(\''+tc.id+'\',\'pending\')">RESET</button>'
             +'</div>'
-            +'<button class="sm danger" onclick="event.stopPropagation();deleteTc(\''+tc.id+'\')" style="margin-left:auto">🗑</button>'
+            +'<button class="sm danger" onclick="event.stopPropagation();deleteTc(\''+tc.id+'\')" style="margin-left:auto"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 11v6M14 11v6M9 6V4h6v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>'
           +'</div>'
           +'<div class="note-row">'
             +'<input type="text" id="tcn_'+tc.id+'" placeholder="Add note..." value="'+esc(tc.note||'')+'" onblur="saveTcNote(\''+tc.id+'\')" onkeydown="if(event.key===\'Enter\')saveTcNote(\''+tc.id+'\')" />'
@@ -856,8 +858,8 @@ function handleImgAttach(inp){
   });inp.value='';
 }
 function renderPendingImgs(){
-  document.getElementById('img-attach-label').textContent=pendingImgs.length?pendingImgs.length+' image(s)':'Attach screenshot';
-  document.getElementById('pending-imgs').innerHTML=pendingImgs.map(function(src,i){
+  document.getElementById('img-count-label').textContent=pendingImgs.length?pendingImgs.length+' image(s)':'Attach screenshot';
+  document.getElementById('pending-img-row').innerHTML=pendingImgs.map(function(src,i){
     return '<img src="'+src+'" style="width:60px;height:45px;border-radius:4px;object-fit:cover;border:1px solid var(--border);cursor:pointer" onclick="removePendingImg('+i+')" title="Click to remove" />';
   }).join('');
 }
@@ -933,7 +935,7 @@ function renderBugs(){
   updateStats();
   var el=document.getElementById('bug-list');
   if(!S.bugs.length){
-    el.innerHTML='<div class="empty-state"><div class="empty-icon">🐛</div><div class="empty-text">No bugs logged yet.</div></div>';return;
+    el.innerHTML='<div class="empty-state"><div class="empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" style="opacity:0.25"><circle cx="12" cy="13" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 7C9.5 5.6 10.6 4.5 12 4.5s2.5 1.1 2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3 9.5h2.5M18.5 9.5H21M3 13.5h2.5M18.5 13.5H21M12 18v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="empty-text">No bugs logged yet.</div></div>';return;
   }
   var sc={critical:'sev-critical',major:'sev-major',minor:'sev-minor'};
   var stc={open:'bs-open',fixed:'bs-fixed','check-prod':'bs-check-prod',verified:'bs-verified'};
@@ -952,12 +954,12 @@ function renderBugs(){
           +'</div>'
           +'<div class="bug-title">'+esc(b.title)+'</div>'
         +'</div>'
-        +'<button class="sm danger" onclick="deleteBug(\''+b.id+'\')">🗑</button>'
+        +'<button class="sm danger" onclick="deleteBug(\''+b.id+'\')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 11v6M14 11v6M9 6V4h6v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>'
       +'</div>'
       +(b.desc?'<div class="bug-desc">'+esc(b.desc).replace(/\n/g,'<br>')+'</div>':'')
       +'<div class="bug-imgs">'
         +b.images.map(function(src){return '<img src="'+src+'" class="bug-img" onclick="previewImg(this.src)" />'}).join('')
-        +'<label class="bug-add-img"><input type="file" accept="image/*" onchange="addBugImg(\''+b.id+'\',this)" />'+(b.images.length?'+':'📎')+'</label>'
+        +'<label class="bug-add-img"><input type="file" accept="image/*" onchange="addBugImg(\''+b.id+'\',this)" />'+(b.images.length?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66L9.41 17.41a2 2 0 01-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>')+'</label>'
       +'</div>'
       +(b.notes.length?'<div class="bug-notes">'+b.notes.map(function(n){return '<div class="bug-note"><span class="note-time">'+n.time+'</span>'+esc(n.text)+'</div>';}).join('')+'</div>':'')
       +(needsProd?
@@ -1011,7 +1013,7 @@ function renderGate(){
   document.getElementById('gate-prog-txt').textContent=done+' / '+total+' verified on Prod';
   var el=document.getElementById('gate-content');
   if(!total){
-    el.innerHTML='<div class="gate-empty"><div class="gate-empty-icon">🔴</div>PROD GATE IS CLEAR<br/><br/>Add issues + test cases via the sidebar.<br/>Log bugs on the Bugs tab.<br/><span style="color:#3a3a34">Everything auto-appears here.</span></div>';
+    el.innerHTML='<div class="gate-empty"><div class="gate-empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" style="opacity:0.25"><path d="M3 12V19a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3 12l9-9 9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="9" y="13" width="2.5" height="4" rx="0.5" stroke="currentColor" stroke-width="1.3"/><rect x="12.5" y="13" width="2.5" height="4" rx="0.5" stroke="currentColor" stroke-width="1.3"/></svg></div>PROD GATE IS CLEAR<br/><br/>Add issues + test cases via the sidebar.<br/>Log bugs on the Bugs tab.<br/><span style="color:#3a3a34">Everything auto-appears here.</span></div>';
     updateStats();return;
   }
   var groups={};
@@ -1041,7 +1043,7 @@ function renderGate(){
       +'<div class="gi-box">'+(item.checked?'✓':'')+'</div>'
       +'<span class="gi-label">'+esc(item.label)+'</span>'
       +badge
-      +'<button class="sm danger" onclick="event.stopPropagation();deleteGateItem(\''+item.id+'\')" style="margin-left:4px">🗑</button>'
+      +'<button class="sm danger" onclick="event.stopPropagation();deleteGateItem(\''+item.id+'\')" style="margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9 6V4h6v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>'
     +'</div>';
   }
   var html='';
@@ -1062,7 +1064,7 @@ function renderGate(){
   var ungrouped=groups['__none__'];
   if(ungrouped&&ungrouped.length){
     html+='<div class="gate-group">'
-      +'<div class="gate-group-hdr"><span class="gate-group-title">📋 MANUAL / UNGROUPED</span><span class="gate-group-prog">'+ungrouped.filter(function(x){return x.checked}).length+'/'+ungrouped.length+'</span></div>'
+      +'<div class="gate-group-hdr"><span class="gate-group-title"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" style="vertical-align:middle;margin-right:4px"><rect x="1" y="1" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 5h6M4 7h6M4 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>MANUAL / UNGROUPED</span><span class="gate-group-prog">'+ungrouped.filter(function(x){return x.checked}).length+'/'+ungrouped.length+'</span></div>'
       +ungrouped.map(renderItem).join('')
     +'</div>';
   }
