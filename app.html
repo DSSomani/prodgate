@@ -254,6 +254,31 @@ input[type=file]{display:none}
 .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg2);border:1px solid var(--gate);border-radius:var(--r2);padding:10px 16px;font-family:var(--mono);font-size:12px;color:var(--gate2);z-index:500;transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:280px}
 .toast.show{transform:translateY(0);opacity:1}
 
+/* EXPORT DROPDOWN */
+.export-wrap{position:relative}
+.export-btn{background:transparent;border:1px solid var(--border2);color:var(--paper2);font-family:var(--display);font-size:15px;letter-spacing:0.06em;padding:6px 12px;border-radius:var(--r);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.export-btn:hover{border-color:var(--gate);color:var(--gate2)}
+.export-drop{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);min-width:200px;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,0.5)}
+.export-drop.hidden{display:none}
+.export-drop-item{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:12px;font-family:var(--mono);color:var(--paper2);cursor:pointer;transition:background 0.15s}
+.export-drop-item:hover{background:var(--bg3);color:var(--paper)}
+.export-drop-item svg{flex-shrink:0;opacity:0.6}
+.export-drop-divider{height:1px;background:var(--border);margin:3px 0}
+
+/* IMPORT */
+.import-btn{background:transparent;border:1px solid var(--border2);color:var(--paper2);font-family:var(--display);font-size:15px;letter-spacing:0.06em;padding:6px 12px;border-radius:var(--r);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.import-btn:hover{border-color:var(--gate);color:var(--gate2)}
+.import-help{font-family:var(--mono);font-size:10px;color:#5a5a50;line-height:1.5;margin-top:6px}
+.import-results{margin-top:10px;max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);background:var(--bg3)}
+.import-item{padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;color:var(--paper2);line-height:1.4}
+.import-item:last-child{border-bottom:none}
+.import-meta{font-family:var(--mono);font-size:10px;color:#6a6a58}
+.import-controls{margin-top:10px;display:none;align-items:center;justify-content:space-between;gap:8px}
+.import-check-label{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--paper2);cursor:pointer}
+.import-count{font-family:var(--mono);font-size:11px;color:#6a6a58}
+.import-item-row{display:flex;align-items:flex-start;gap:8px;cursor:pointer}
+.import-item-row input{margin-top:2px}
+
 /* EMPTY */
 .empty-state{text-align:center;padding:3rem 1rem;color:#4a4a40}
 .empty-icon{margin-bottom:0.75rem;display:flex;justify-content:center}
@@ -278,6 +303,31 @@ input[type=file]{display:none}
     <div class="stat-chip"><span class="sc-num sc-a" id="s-bugs">0</span><span style="color:#4a4a40">BUGS</span></div>
   </div>
   <div class="topbar-right">
+    <button class="import-btn" onclick="openImportModal()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M14 3h7v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M21 3l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="3" y="8" width="10" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/></svg>
+      IMPORT
+    </button>
+    <div class="export-wrap">
+      <button class="export-btn" onclick="toggleExportDrop(event)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        EXPORT <span style="font-size:10px;opacity:0.5">▾</span>
+      </button>
+      <div class="export-drop hidden" id="export-drop">
+        <div class="export-drop-item" onclick="exportTestsCSV()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 8h10M7 12h10M7 16h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Test Cases — CSV
+        </div>
+        <div class="export-drop-item" onclick="exportBugsCSV()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 7C9.5 5.6 10.6 4.5 12 4.5s2.5 1.1 2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3 9.5h2.5M18.5 9.5H21M3 13.5h2.5M18.5 13.5H21M12 18v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Bug Log — CSV
+        </div>
+        <div class="export-drop-divider"></div>
+        <div class="export-drop-item" onclick="exportGatePDF()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.6"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M9 13h6M9 17h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Full Report — PDF
+        </div>
+      </div>
+    </div>
     <button class="topbar-btn" onclick="switchTab('gate')">
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="vertical-align:middle;margin-right:5px"><circle cx="6" cy="6" r="5" fill="#fff" opacity="0.25"/><circle cx="6" cy="6" r="3" fill="#fff"/></svg>PROD GATE</button>
   </div>
@@ -460,6 +510,112 @@ input[type=file]{display:none}
   </div>
 </div>
 
+<!-- IMPORT MODAL -->
+<div class="overlay hidden" id="import-modal">
+  <div class="modal" style="max-width:620px">
+    <h3>IMPORT <span>ISSUES</span></h3>
+    <div class="form-grid three" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="field-group">
+        <div class="form-label">Source</div>
+        <select id="import-source" onchange="toggleImportSourceFields()">
+          <option value="github">GitHub</option>
+          <option value="jira">Jira</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="form-label">Mode</div>
+        <select id="import-mode" onchange="toggleImportModeFields()">
+          <option value="list">List (preview many)</option>
+          <option value="single">Specific issue</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="form-label">Project (ProdGate)</div>
+        <select id="import-proj"></select>
+      </div>
+    </div>
+    <div class="form-grid" style="margin-top:8px">
+      <div class="field-group" id="import-limit-wrap">
+        <div class="form-label">Max</div>
+        <input type="text" id="import-limit" value="20" />
+      </div>
+      <div class="field-group" id="gh-specific-wrap" style="display:none">
+        <div class="form-label">GitHub Issue Number</div>
+        <input type="text" id="gh-issue-number" placeholder="e.g. 123" />
+      </div>
+      <div class="field-group" id="jira-specific-wrap" style="display:none">
+        <div class="form-label">Jira Issue Key</div>
+        <input type="text" id="jira-issue-key" placeholder="e.g. ABC-123" />
+      </div>
+    </div>
+
+    <div id="import-github-fields">
+      <div class="form-grid" style="margin-top:8px">
+        <div class="field-group">
+          <div class="form-label">Owner</div>
+          <input type="text" id="gh-owner" placeholder="e.g. octocat" />
+        </div>
+        <div class="field-group">
+          <div class="form-label">Repository</div>
+          <input type="text" id="gh-repo" placeholder="e.g. hello-world" />
+        </div>
+      </div>
+      <div class="form-grid" style="margin-top:8px">
+        <div class="field-group">
+          <div class="form-label">State</div>
+          <select id="gh-state">
+            <option value="open">Open</option>
+            <option value="all">All</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="form-label">Token (optional)</div>
+          <input type="text" id="gh-token" placeholder="GitHub token for private repos" />
+        </div>
+      </div>
+    </div>
+
+    <div id="import-jira-fields" style="display:none">
+      <div class="form-grid" style="margin-top:8px">
+        <div class="field-group">
+          <div class="form-label">Jira Base URL</div>
+          <input type="text" id="jira-base" placeholder="https://your-domain.atlassian.net" />
+        </div>
+        <div class="field-group">
+          <div class="form-label">Email</div>
+          <input type="email" id="jira-email" placeholder="name@company.com" />
+        </div>
+      </div>
+      <div class="form-grid" style="margin-top:8px">
+        <div class="field-group">
+          <div class="form-label">API Token</div>
+          <input type="text" id="jira-token" placeholder="Atlassian API token" />
+        </div>
+        <div class="field-group">
+          <div class="form-label">JQL</div>
+          <input type="text" id="jira-jql" placeholder="project = ABC ORDER BY created DESC" />
+        </div>
+      </div>
+    </div>
+
+    <div class="import-help">This uses a local proxy at http://localhost:8787 to fetch data securely. Imported issue names are added to the selected ProdGate project.</div>
+    <div class="import-controls" id="import-controls">
+      <label class="import-check-label">
+        <input type="checkbox" id="import-select-all" onchange="toggleImportAll(this.checked)" />
+        Select all
+      </label>
+      <span class="import-count" id="import-selected-count">0 selected</span>
+    </div>
+    <div class="import-results" id="import-results" style="display:none"></div>
+    <div class="modal-footer">
+      <button onclick="closeModal('import-modal')">Cancel</button>
+      <button onclick="fetchImportPreview()">Preview</button>
+      <button class="primary" onclick="importSelectedIssues()">Import</button>
+    </div>
+  </div>
+</div>
+
 <!-- SESSION MODAL -->
 <div class="overlay hidden" id="session-modal">
   <div class="modal">
@@ -527,9 +683,49 @@ var S = {
 
 function save(){try{localStorage.setItem('pg_mvp2',JSON.stringify(S))}catch(e){}}
 function load(){try{var d=localStorage.getItem('pg_mvp2');if(d){var p=JSON.parse(d);Object.keys(p).forEach(function(k){S[k]=p[k];});}}catch(e){}}
-load();
 
 var COLORS = ['#e8390e','#4ade80','#60a5fa','#fbbf24','#c084fc','#f472b6','#34d399','#fb923c'];
+
+function normalizeState(){
+  if(!Array.isArray(S.projects))S.projects=[];
+  if(!Array.isArray(S.issues))S.issues=[];
+  if(!Array.isArray(S.tests))S.tests=[];
+  if(!Array.isArray(S.bugs))S.bugs=[];
+  if(!Array.isArray(S.gateItems))S.gateItems=[];
+  if(!Array.isArray(S.areas))S.areas=[];
+
+  S.projects=S.projects.filter(function(p){
+    return p && typeof p.id==='string' && typeof p.name==='string';
+  }).map(function(p,idx){
+    return {
+      id:p.id,
+      name:p.name,
+      color:p.color||COLORS[idx%COLORS.length],
+      open:!!p.open
+    };
+  });
+
+  var projIds={};
+  S.projects.forEach(function(p){if(p&&p.id)projIds[p.id]=true;});
+
+  S.issues=S.issues.filter(function(i){return i&&i.id&&i.projId&&projIds[i.projId];});
+  var issueIds={};
+  S.issues.forEach(function(i){issueIds[i.id]=true;});
+
+  S.tests=S.tests.filter(function(t){return t&&t.id&&issueIds[t.issueId];});
+  S.bugs=S.bugs.filter(function(b){return b&&b.id&&(!b.issueId||issueIds[b.issueId]);});
+  S.gateItems=S.gateItems.filter(function(g){
+    if(!g||!g.id)return false;
+    if(g.issueId && !issueIds[g.issueId])return false;
+    return true;
+  });
+
+  if(S.activeProj && !projIds[S.activeProj])S.activeProj=null;
+  if(S.activeIssue && !issueIds[S.activeIssue])S.activeIssue=null;
+}
+
+load();
+normalizeState();
 
 // ─── UTILS ───────────────────────────────────────────────────────
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
@@ -538,6 +734,7 @@ function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.c
 function openModal(id){document.getElementById(id).classList.remove('hidden')}
 function closeModal(id){document.getElementById(id).classList.add('hidden')}
 function openAreaModal(){renderAreaModal();openModal('area-modal');}
+var importBuffer=[];
 var _confirmAction=null;
 function openConfirmModal(title,message,confirmText,onConfirm){
   _confirmAction=onConfirm||null;
@@ -607,6 +804,7 @@ function renderSidebar(){
   var el=document.getElementById('sidebar-tree');
   var html='';
   S.projects.forEach(function(proj){
+    if(!proj||!proj.id)return;
     html+='<div class="proj-row'+(proj.id===S.activeProj?' active-proj':'')+'" onclick="selectProj(\''+proj.id+'\')">'
       +'<span class="proj-arrow'+(proj.open?' open':'')+'">▶</span>'
       +'<span class="proj-dot" style="background:'+proj.color+'"></span>'
@@ -709,6 +907,15 @@ function saveIssue(){
   selectIssue(id);
   toast('Issue created ✓');
 }
+function addIssueToProject(projId,name){
+  var clean=(name||'').trim();
+  if(!clean||!projId)return null;
+  var exists=S.issues.some(function(i){return i.projId===projId&&i.name.toLowerCase()===clean.toLowerCase();});
+  if(exists)return null;
+  var id=uid();
+  S.issues.push({id:id,projId:projId,name:clean});
+  return id;
+}
 function deleteIssue(id){
   openConfirmModal('DELETE','Delete this issue and all its test cases?','Delete Issue',function(){
     S.issues=S.issues.filter(function(i){return i.id!==id});
@@ -803,6 +1010,10 @@ function saveTcNote(id){
 function toggleTc(id){S.openTc=S.openTc===id?null:id;renderTests();}
 
 function renderTests(){
+  if(S.activeIssue && !S.issues.some(function(i){return i.id===S.activeIssue;})){
+    S.activeIssue=null;
+    save();
+  }
   var noCtx=document.getElementById('tests-no-ctx');
   var ctx=document.getElementById('tests-ctx');
   if(!S.activeIssue){noCtx.style.display='';ctx.style.display='none';updateStats();return;}
@@ -986,6 +1197,177 @@ function addManualGateItem(){
   S.gateItems.push({id:uid(),type:'manual',refId:null,issueId:null,label:label,checked:false,auto:false});
   save();renderGate();updateStats();
 }
+
+// ─── IMPORT (GITHUB / JIRA) ─────────────────────────────────────
+function openImportModal(){
+  var sel=document.getElementById('import-proj');
+  if(!S.projects.length){
+    toast('Create a project first');
+    return;
+  }
+  sel.innerHTML=S.projects.map(function(p){
+    return '<option value="'+p.id+'">'+esc(p.name)+'</option>';
+  }).join('');
+  if(S.activeProj)sel.value=S.activeProj;
+  document.getElementById('import-results').style.display='none';
+  document.getElementById('import-results').innerHTML='';
+  document.getElementById('import-controls').style.display='none';
+  document.getElementById('import-selected-count').textContent='0 selected';
+  document.getElementById('import-select-all').checked=false;
+  importBuffer=[];
+  toggleImportSourceFields();
+  openModal('import-modal');
+}
+function toggleImportSourceFields(){
+  var src=document.getElementById('import-source').value;
+  document.getElementById('import-github-fields').style.display=(src==='github')?'':'none';
+  document.getElementById('import-jira-fields').style.display=(src==='jira')?'':'none';
+  toggleImportModeFields();
+}
+function toggleImportModeFields(){
+  var src=document.getElementById('import-source').value;
+  var mode=document.getElementById('import-mode').value;
+  var isSingle=mode==='single';
+  document.getElementById('import-limit-wrap').style.display=isSingle?'none':'';
+  document.getElementById('gh-specific-wrap').style.display=(src==='github'&&isSingle)?'':'none';
+  document.getElementById('jira-specific-wrap').style.display=(src==='jira'&&isSingle)?'':'none';
+}
+function parseImportLimit(){
+  var n=parseInt(document.getElementById('import-limit').value,10);
+  if(!n||n<1)n=20;
+  if(n>100)n=100;
+  return n;
+}
+function updateImportSelectionUI(){
+  var total=importBuffer.length;
+  var selected=importBuffer.filter(function(it){return !!it.selected;}).length;
+  var controls=document.getElementById('import-controls');
+  var selectAll=document.getElementById('import-select-all');
+  var count=document.getElementById('import-selected-count');
+
+  controls.style.display=total?'flex':'none';
+  count.textContent=selected+' selected';
+  selectAll.checked=!!total&&selected===total;
+}
+function renderImportResults(){
+  var results=document.getElementById('import-results');
+  if(!importBuffer.length){
+    results.innerHTML='<div class="import-item">No issues returned.</div>';
+    updateImportSelectionUI();
+    return;
+  }
+  results.innerHTML=importBuffer.map(function(it,idx){
+    return '<div class="import-item">'
+      +'<div class="import-item-row" onclick="toggleImportItem('+idx+')">'
+        +'<input type="checkbox" '+(it.selected?'checked ':'')+'onclick="event.stopPropagation();toggleImportItem('+idx+')" />'
+        +'<div>'
+          +'<div>'+esc(it.title||'Untitled')+'</div>'
+          +'<div class="import-meta">'+esc(it.key||'')+(it.url?' • '+esc(it.url):'')+'</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  updateImportSelectionUI();
+}
+function toggleImportItem(idx){
+  if(!importBuffer[idx])return;
+  importBuffer[idx].selected=!importBuffer[idx].selected;
+  renderImportResults();
+}
+function toggleImportAll(checked){
+  importBuffer=importBuffer.map(function(it){
+    return {key:it.key,title:it.title,url:it.url,selected:!!checked};
+  });
+  renderImportResults();
+}
+async function fetchImportPreview(){
+  var src=document.getElementById('import-source').value;
+  var mode=document.getElementById('import-mode').value;
+  var limit=parseImportLimit();
+  var results=document.getElementById('import-results');
+  results.style.display='';
+  results.innerHTML='<div class="import-item">Loading...</div>';
+  document.getElementById('import-controls').style.display='none';
+
+  try{
+    var payload={source:src,mode:mode};
+    if(mode!=='single')payload.limit=limit;
+    if(src==='github'){
+      payload.owner=document.getElementById('gh-owner').value.trim();
+      payload.repo=document.getElementById('gh-repo').value.trim();
+      payload.state=document.getElementById('gh-state').value;
+      payload.token=document.getElementById('gh-token').value.trim();
+      if(!payload.owner||!payload.repo)throw new Error('Enter GitHub owner and repository');
+      if(mode==='single'){
+        payload.issueNumber=document.getElementById('gh-issue-number').value.trim();
+        if(!payload.issueNumber)throw new Error('Enter a GitHub issue number');
+      }
+    } else {
+      payload.baseUrl=document.getElementById('jira-base').value.trim();
+      payload.email=document.getElementById('jira-email').value.trim();
+      payload.token=document.getElementById('jira-token').value.trim();
+      payload.jql=document.getElementById('jira-jql').value.trim();
+      if(!payload.baseUrl||!payload.email||!payload.token)throw new Error('Enter Jira base URL, email, and token');
+      if(mode==='single'){
+        payload.issueKey=document.getElementById('jira-issue-key').value.trim();
+        if(!payload.issueKey)throw new Error('Enter a Jira issue key');
+      } else {
+        if(!payload.jql)throw new Error('Enter Jira JQL');
+      }
+    }
+
+    var res=await fetch('http://localhost:8787/api/import/issues',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    var data=await res.json();
+    if(!res.ok)throw new Error(data&&data.error?data.error:'Import request failed');
+
+    importBuffer=(Array.isArray(data.items)?data.items:[]).map(function(it){
+      return {
+        key:it.key||'',
+        title:it.title||'Untitled',
+        url:it.url||'',
+        selected:true
+      };
+    });
+    if(!importBuffer.length){
+      renderImportResults();
+      return;
+    }
+    renderImportResults();
+    toast(importBuffer.length+' issue(s) ready to import');
+  }catch(err){
+    results.innerHTML='<div class="import-item" style="color:var(--red)">'+esc(err.message||'Failed')+'</div>';
+    importBuffer=[];
+    updateImportSelectionUI();
+  }
+}
+function importSelectedIssues(){
+  var projId=document.getElementById('import-proj').value;
+  if(!projId){toast('Select a project');return;}
+  if(!importBuffer.length){toast('Preview issues first');return;}
+
+  var selectedItems=importBuffer.filter(function(it){return !!it.selected;});
+  if(!selectedItems.length){toast('Select at least one issue');return;}
+
+  var created=0;
+  var firstId=null;
+  selectedItems.forEach(function(it){
+    var title=(it.title||'').trim();
+    if(it.key)title=it.key+' - '+title;
+    var id=addIssueToProject(projId,title);
+    if(id){created++;if(!firstId)firstId=id;}
+  });
+
+  save();
+  renderSidebar();
+  updateStats();
+  closeModal('import-modal');
+  if(firstId)selectIssue(firstId);
+  toast(created+' issue(s) imported ✓');
+}
 function toggleGateItem(id){
   var item=S.gateItems.find(function(x){return x.id===id});if(!item)return;
   item.checked=!item.checked;
@@ -1072,6 +1454,127 @@ function renderGate(){
   updateStats();
 }
 
+// ─── EXPORT ──────────────────────────────────────────────────────
+function toggleExportDrop(e){
+  e.stopPropagation();
+  document.getElementById('export-drop').classList.toggle('hidden');
+}
+document.addEventListener('click',function(){
+  var d=document.getElementById('export-drop');
+  if(d)d.classList.add('hidden');
+});
+function csvEsc(v){
+  var s=v==null?'':String(v);
+  if(/[",\n\r]/.test(s))s='"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+function downloadCSV(filename,rows){
+  var content=rows.map(function(r){return r.map(csvEsc).join(',');}).join('\r\n');
+  var blob=new Blob([content],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=filename;a.click();
+  URL.revokeObjectURL(url);
+}
+function exportTestsCSV(){
+  if(!S.tests.length){toast('No test cases to export');return;}
+  var rows=[['Project','Issue','Title','Area','Priority','Status','Steps/Notes','Note','Created']];
+  S.tests.forEach(function(tc){
+    var issue=S.issues.find(function(i){return i.id===tc.issueId;});
+    var proj=issue?S.projects.find(function(p){return p.id===issue.projId;}):null;
+    rows.push([proj?proj.name:'',issue?issue.name:'',tc.title,tc.area,tc.priority,tc.status,tc.steps,tc.note,tc.created]);
+  });
+  downloadCSV('prodgate-test-cases.csv',rows);
+  toast('Test cases exported ✓');
+}
+function exportBugsCSV(){
+  if(!S.bugs.length){toast('No bugs to export');return;}
+  var rows=[['Issue','Title','Severity','Environment','Status','Description','Notes','Created']];
+  S.bugs.forEach(function(b){
+    var issue=b.issueId?S.issues.find(function(i){return i.id===b.issueId;}):null;
+    rows.push([issue?issue.name:'',b.title,b.severity,b.env,b.status,b.desc,b.notes.map(function(n){return n.time+': '+n.text;}).join(' | '),b.created]);
+  });
+  downloadCSV('prodgate-bugs.csv',rows);
+  toast('Bugs exported ✓');
+}
+function exportGatePDF(){
+  var win=window.open('','_blank');
+  var session=S.session;
+  var date=new Date().toLocaleString();
+  var total=S.gateItems.length;
+  var done=S.gateItems.filter(function(x){return x.checked;}).length;
+  var pct=total?Math.round(done/total*100):0;
+  var stlbl={pass:'PASS',fail:'FAIL',pending:'PENDING',blocked:'BLOCKED',open:'OPEN',fixed:'FIXED QA','check-prod':'CHECK PROD',verified:'VERIFIED'};
+  var stcol={pass:'#16a34a',fail:'#dc2626',pending:'#888',blocked:'#d97706',open:'#2563eb',fixed:'#16a34a','check-prod':'#7c3aed',verified:'#16a34a'};
+  function row(){var cols=Array.prototype.slice.call(arguments);return '<tr>'+cols.map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';}
+  function th(){var cols=Array.prototype.slice.call(arguments);return '<tr>'+cols.map(function(c){return '<th>'+c+'</th>';}).join('')+'</tr>';}
+  var h='<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>ProdGate Report — '+esc(session)+'</title><style>'
+    +'*{box-sizing:border-box;margin:0;padding:0}'
+    +'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111;padding:2.5rem;max-width:960px;margin:0 auto;font-size:13px}'
+    +'h1{font-size:2.2rem;font-weight:900;letter-spacing:0.03em;margin-bottom:4px}'
+    +'h1 span{color:#e8390e}'
+    +'.meta{color:#666;font-size:12px;margin-bottom:1.5rem}'
+    +'.summary{display:flex;gap:1.5rem;margin-bottom:2rem;padding:1rem 1.25rem;background:#f8f8f6;border-radius:6px;border-left:4px solid #e8390e}'
+    +'.sum-num{font-size:1.8rem;font-weight:800;line-height:1}'
+    +'.sum-lbl{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:0.07em}'
+    +'h2{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;border-bottom:2px solid #111;padding-bottom:5px;margin:2rem 0 0.75rem}'
+    +'table{width:100%;border-collapse:collapse;font-size:12px}'
+    +'th{text-align:left;padding:6px 10px;background:#f0efeb;border:1px solid #ddd;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700}'
+    +'td{padding:7px 10px;border:1px solid #ddd;vertical-align:top;line-height:1.45}'
+    +'.badge{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:2px;letter-spacing:0.05em}'
+    +'.chk{color:#16a34a;font-weight:800} .unchk{color:#bbb}'
+    +'@media print{body{padding:1.5rem}}'
+    +'</style></head><body>'
+    +'<h1>PROD<span>GATE</span> REPORT</h1>'
+    +'<div class="meta">Session: <strong>'+esc(session)+'</strong> &nbsp;·&nbsp; Generated: '+date+'</div>'
+    +'<div class="summary">'
+      +'<div><div class="sum-num">'+pct+'%</div><div class="sum-lbl">Gate Complete</div></div>'
+      +'<div><div class="sum-num">'+done+'/'+total+'</div><div class="sum-lbl">Items Verified</div></div>'
+      +'<div><div class="sum-num">'+S.tests.length+'</div><div class="sum-lbl">Test Cases</div></div>'
+      +'<div><div class="sum-num">'+S.bugs.length+'</div><div class="sum-lbl">Bugs Logged</div></div>'
+    +'</div>';
+  // Prod Gate
+  h+='<h2>Prod Gate Checklist ('+done+' / '+total+' verified)</h2>';
+  if(total){
+    h+='<table>'+th('#','Item','Type','Status','Verified');
+    S.gateItems.forEach(function(item,idx){
+      var status='';
+      if(item.type==='tc'){var tc=S.tests.find(function(t){return t.id===item.refId;});status=tc?tc.status:'pending';}
+      else if(item.type==='bug'){var b=S.bugs.find(function(x){return x.id===item.refId;});status=b?b.status:'open';}
+      else{status='manual';}
+      var col=stcol[status]||'#888';
+      h+=row(idx+1,esc(item.label),'<span class="badge" style="background:'+col+'22;color:'+col+'">'+item.type.toUpperCase()+'</span>','<span style="color:'+col+';font-weight:600">'+(stlbl[status]||status)+'</span>',item.checked?'<span class="chk">✓ YES</span>':'<span class="unchk">—</span>');
+    });
+    h+='</table>';
+  } else {h+='<p style="color:#888;font-size:12px;padding:0.5rem 0">No gate items yet.</p>';}
+  // Test Cases
+  h+='<h2>Test Cases ('+S.tests.length+')</h2>';
+  if(S.tests.length){
+    h+='<table>'+th('Title','Area','Priority','Status','Project › Issue','Created');
+    S.tests.forEach(function(tc){
+      var issue=S.issues.find(function(i){return i.id===tc.issueId;});
+      var proj=issue?S.projects.find(function(p){return p.id===issue.projId;}):null;
+      var col=stcol[tc.status]||'#888';
+      h+=row(esc(tc.title),esc(tc.area),tc.priority,'<span style="color:'+col+';font-weight:600">'+(stlbl[tc.status]||tc.status)+'</span>',(proj?esc(proj.name)+' › ':'')+esc(issue?issue.name:'—'),tc.created);
+    });
+    h+='</table>';
+  } else {h+='<p style="color:#888;font-size:12px;padding:0.5rem 0">No test cases logged.</p>';}
+  // Bugs
+  h+='<h2>Bug Log ('+S.bugs.length+')</h2>';
+  if(S.bugs.length){
+    h+='<table>'+th('Title','Severity','Env','Status','Description','Created');
+    S.bugs.forEach(function(b){
+      var col=stcol[b.status]||'#888';
+      var sevcol={critical:'#dc2626',major:'#d97706',minor:'#666'};
+      h+=row('<strong>'+esc(b.title)+'</strong>','<span style="color:'+(sevcol[b.severity]||'#888')+';font-weight:600">'+b.severity.toUpperCase()+'</span>',b.env,'<span style="color:'+col+';font-weight:600">'+(stlbl[b.status]||b.status)+'</span>',esc(b.desc),b.created);
+    });
+    h+='</table>';
+  } else {h+='<p style="color:#888;font-size:12px;padding:0.5rem 0">No bugs logged.</p>';}
+  h+='</'+'body></'+'html>';
+  win.document.write(h);win.document.close();win.focus();
+  setTimeout(function(){win.print();},400);
+  toast('Opening PDF report ✓');
+}
+
 // ─── IMG PREVIEW ─────────────────────────────────────────────────
 function previewImg(src){
   document.getElementById('img-prev-src').src=src;
@@ -1082,7 +1585,7 @@ function closeImgPreview(){document.getElementById('img-prev').classList.add('hi
 // ─── KEYBOARD ────────────────────────────────────────────────────
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
-    ['session-modal','proj-modal','issue-modal','area-modal'].forEach(function(id){closeModal(id);});
+    ['session-modal','proj-modal','issue-modal','area-modal','import-modal'].forEach(function(id){closeModal(id);});
     closeConfirmModal();
     closeImgPreview();
   }
@@ -1090,7 +1593,7 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Enter'&&!document.getElementById('issue-modal').classList.contains('hidden'))saveIssue();
   if(e.key==='Enter'&&!document.getElementById('confirm-modal').classList.contains('hidden'))confirmModalProceed();
 });
-['session-modal','proj-modal','issue-modal','area-modal','confirm-modal'].forEach(function(id){
+['session-modal','proj-modal','issue-modal','area-modal','import-modal','confirm-modal'].forEach(function(id){
   document.getElementById(id).addEventListener('click',function(e){
     if(e.target!==this)return;
     if(id==='confirm-modal')closeConfirmModal();
