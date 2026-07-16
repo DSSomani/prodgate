@@ -137,8 +137,12 @@ button.success:hover{background:var(--green-bg)}
 .tc-chk.pass{background:var(--green-bg);border-color:var(--green);color:var(--green)}
 .tc-chk.fail{background:var(--red-bg);border-color:var(--red);color:var(--red)}
 .tc-chk.blocked{background:var(--amber-bg);border-color:var(--amber);color:var(--amber)}
-.tc-title-text{flex:1;font-size:13px;font-weight:600}
+.tc-title-wrap{flex:1;min-width:0;display:flex;align-items:center;gap:6px}
+.tc-title-text{flex:1;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tc-title-text.done{text-decoration:line-through;color:#4a4a40}
+.tc-title-input{width:100%;padding:5px 8px;font-size:12px;border-radius:var(--r);border:1px solid var(--gate);background:var(--bg3);color:var(--paper);font-family:var(--body);outline:none}
+.tc-edit-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:#6a6a58;cursor:pointer;flex-shrink:0;transition:all 0.15s}
+.tc-edit-btn:hover{border-color:var(--gate);color:var(--gate2)}
 .tc-area-tag{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:2px;background:var(--bg4);color:#6a6a58}
 .sp{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:2px;font-weight:600}
 .sp-pending{background:var(--bg4);color:#5a5a50}
@@ -927,6 +931,7 @@ function saveSession(){
 
 // ─── TABS ────────────────────────────────────────────────────────
 var activeTab='tests';
+var tcTitleEditId=null;
 function switchTab(t){
   if(activeTab==='md'&&t!=='md'&&window.mdSaveCurrentToIssue)mdSaveCurrentToIssue();
   activeTab=t;
@@ -1173,6 +1178,48 @@ function setTcStatus(id,s){
   if(gi)gi.checked=(s==='pass');
   save();renderTests();if(activeTab==='gate')renderGate();updateStats();
 }
+function startTcTitleEdit(id,e){
+  if(e)e.stopPropagation();
+  tcTitleEditId=id;
+  if(S.openTc!==id)S.openTc=id;
+  renderTests();
+  setTimeout(function(){
+    var el=document.getElementById('tct_'+id);
+    if(el){el.focus();el.select();}
+  },0);
+}
+function cancelTcTitleEdit(id,e){
+  if(e)e.stopPropagation();
+  if(tcTitleEditId!==id)return;
+  tcTitleEditId=null;
+  renderTests();
+}
+function saveTcTitle(id){
+  var tc=S.tests.find(function(t){return t.id===id});
+  var el=document.getElementById('tct_'+id);
+  if(!tc||!el)return;
+  var next=el.value.trim();
+  if(!next){
+    tcTitleEditId=null;
+    renderTests();
+    toast('Title cannot be empty');
+    return;
+  }
+  var changed=next!==tc.title;
+  if(changed){
+    tc.title=next;
+    var gi=S.gateItems.find(function(g){return g.type==='tc'&&g.refId===id});
+    if(gi)gi.label=next;
+  }
+  tcTitleEditId=null;
+  save();
+  renderTests();
+  renderSidebar();
+  if(activeTab==='gate')renderGate();
+  if(changed){
+    toast('Test case title updated ✓');
+  }
+}
 function deleteTc(id){
   openConfirmModal('DELETE','Delete test case?','Delete Test Case',function(){
     S.tests=S.tests.filter(function(t){return t.id!==id});
@@ -1207,10 +1254,16 @@ function renderTests(){
   var chkIcon={pass:'✓',fail:'✕',blocked:'—'};
   list.innerHTML=tests.map(function(tc){
     var open=S.openTc===tc.id;
+    var editing=tcTitleEditId===tc.id;
     return '<div class="tc-card">'
-      +'<div class="tc-header" onclick="toggleTc(\''+tc.id+'\')">'
+      +'<div class="tc-header" onclick="toggleTc(\''+tc.id+'\')" ondblclick="startTcTitleEdit(\''+tc.id+'\',event)">'
         +'<div class="tc-chk '+(tc.status!=='pending'?tc.status:'')+'">'+( chkIcon[tc.status]||'')+'</div>'
-        +'<span class="tc-title-text'+(tc.status==='pass'?' done':'')+'">'+esc(tc.title)+'</span>'
+        +'<div class="tc-title-wrap" onclick="event.stopPropagation()">'
+          +(editing
+            ?'<input type="text" class="tc-title-input" id="tct_'+tc.id+'" value="'+esc(tc.title)+'" onblur="saveTcTitle(\''+tc.id+'\')" onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveTcTitle(\''+tc.id+'\');}if(event.key===\'Escape\'){event.preventDefault();cancelTcTitleEdit(\''+tc.id+'\');}" />'
+            :'<span class="tc-title-text'+(tc.status==='pass'?' done':'')+'" ondblclick="startTcTitleEdit(\''+tc.id+'\',event)">'+esc(tc.title)+'</span>')
+        +'</div>'
+        +(editing?'':'<span class="tc-edit-btn" onclick="startTcTitleEdit(\''+tc.id+'\',event)" title="Edit title"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 20h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 113 3L7 19l-4 1 1-4 12.5-12.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>')
         +(tc.area?'<span class="tc-area-tag">'+esc(tc.area)+'</span>':'')
         +'<span class="sp '+(scMap[tc.status]||'sp-pending')+'">'+tc.status.toUpperCase()+'</span>'
         +'<span style="color:#3a3a34;font-size:10px;margin-left:4px">'+(open?'▲':'▼')+'</span>'

@@ -15,6 +15,7 @@ A lightweight, single-file web app for managing test cases, bugs, and production
 - **Test Case Tracking**
   - Add test cases to issues with area/module, priority, and steps
   - Mark test cases as PASS, FAIL, BLOCKED, or PENDING
+  - Edit test case titles inline via pencil icon or double-click
   - Inline notes for each test case
   - All test cases auto-appear in the Prod Gate
 
@@ -57,8 +58,9 @@ A lightweight, single-file web app for managing test cases, bugs, and production
 2. **Create a project** via the sidebar.
 3. **Add issues** to your project.
 4. **Add test cases** and log bugs for each issue.
-5. **Track progress** in the Prod Gate tab.
-6. **Verify** all items before production release.
+5. **Edit test case titles** inline by clicking the pencil icon or double-clicking the case header.
+6. **Track progress** in the Prod Gate tab.
+7. **Verify** all items before production release.
 
 ### Import From GitHub
 
