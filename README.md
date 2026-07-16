@@ -10,7 +10,7 @@ A lightweight, single-file web app for managing test cases, bugs, and production
   - Create, rename, and delete projects
   - Add issues/features to projects
   - Hierarchical sidebar navigation
-  - Import issues from GitHub or Jira into a selected project
+  - Import issues from GitHub into a selected project
 
 - **Test Case Tracking**
   - Add test cases to issues with area/module, priority, and steps
@@ -60,18 +60,17 @@ A lightweight, single-file web app for managing test cases, bugs, and production
 5. **Track progress** in the Prod Gate tab.
 6. **Verify** all items before production release.
 
-### Import From GitHub / Jira
+### Import From GitHub
 
 1. Start the local import proxy:
   - `node import-proxy.js`
 2. Open `app.html`.
 3. Click **IMPORT** in the top bar.
-4. Choose source (`GitHub` or `Jira`) and fill connection details.
+4. Choose `GitHub` and fill connection details.
 5. Click **Preview**, then **Import**.
 
 Notes:
 - GitHub public repos can work without a token (rate limits apply).
-- Jira import uses Jira Cloud API with email + API token.
 - Imported issues are added as ProdGate issues under the selected project.
 
 ---
@@ -111,7 +110,7 @@ Notes:
 ## File Overview
 
 - `app.html`: Main application (use this file)
-- `import-proxy.js`: Local proxy server for GitHub/Jira issue import
+- `import-proxy.js`: Local proxy server for GitHub issue import
 - `app2.html`: Reference/legacy version (do not use)
 - `index.html`: Optional landing page or redirect
 

@@ -364,7 +364,6 @@ code.md-status-error{color:var(--red) !important;background:var(--red-bg) !impor
 
 .md-linked-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:600;padding:1px 6px;border-radius:2px;text-decoration:none;margin-left:3px;cursor:pointer}
 .md-linked-badge.gh{background:var(--green-bg);color:var(--green);border:1px solid var(--green)}
-.md-linked-badge.jira{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber)}
 
 .md-modal-overlay{display:none;position:fixed;inset:0;background:#000000aa;z-index:250;align-items:center;justify-content:center}
 .md-modal-overlay.open{display:flex}
@@ -377,7 +376,6 @@ code.md-status-error{color:var(--red) !important;background:var(--red-bg) !impor
 .md-modal-section{margin-bottom:14px}
 .md-modal-section-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
 .md-modal-section-title.gh{color:var(--green)}
-.md-modal-section-title.jira{color:var(--amber)}
 .md-field-row{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
 .md-field-row label{font-size:10px;color:var(--paper3)}
 .md-field-row input{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);color:var(--paper2);font-size:11px;padding:5px 8px;outline:none;font-family:var(--mono)}
@@ -391,7 +389,6 @@ code.md-status-error{color:var(--red) !important;background:var(--red-bg) !impor
 .md-pop-title{font-size:10.5px;color:var(--paper2);margin-bottom:10px;line-height:1.4;border-left:2px solid var(--red);padding-left:7px}
 .md-pop-btn{width:100%;padding:6px 10px;border-radius:var(--r);font-size:11px;font-weight:600;cursor:pointer;border:1px solid;display:flex;align-items:center;gap:7px;margin-bottom:6px;font-family:var(--body);text-align:left;transition:all .12s}
 .md-pop-btn.gh{background:var(--green-bg);border-color:var(--green);color:var(--green)}
-.md-pop-btn.jira{background:var(--amber-bg);border-color:var(--amber);color:var(--amber)}
 .md-pop-btn:disabled{opacity:.4;cursor:not-allowed}
 .md-pop-divider{border:none;border-top:1px solid var(--border);margin:8px 0}
 .md-pop-link-row{display:flex;gap:5px}
@@ -615,7 +612,7 @@ code.md-status-error{color:var(--red) !important;background:var(--red-bg) !impor
           <button class="md-file-btn" onclick="document.getElementById('md-file-input').click()" title="Import a .md file into this issue's notes (replaces current content)">Load .md File</button>
           <button class="md-file-btn save" onclick="mdSaveFile()" title="Export this issue's notes as a .md file">Save .md</button>
           <span class="md-filename-tag" id="md-filename-tag"></span>
-          <button class="md-settings-btn" onclick="mdOpenSettings()" title="Configure GitHub & Jira">⚙ Integrations</button>
+          <button class="md-settings-btn" onclick="mdOpenSettings()" title="Configure GitHub">⚙ Integrations</button>
           <span class="md-env-pill qa">QA</span>
           <span class="md-env-pill prod">Prod</span>
         </div>
@@ -669,14 +666,6 @@ code.md-status-error{color:var(--red) !important;background:var(--red-bg) !impor
             <div class="md-field-row"><label>Repository Name</label><input id="md-gh-repo" placeholder="e.g. my-project"></div>
             <div class="md-field-row"><label>Personal Access Token (Issues: read/write scope)</label><input id="md-gh-token" type="password" placeholder="ghp_xxxxxxxxxxxx"></div>
           </div>
-          <hr class="md-modal-divider">
-          <div class="md-modal-section">
-            <div class="md-modal-section-title jira">◆ Jira</div>
-            <div class="md-field-row"><label>Jira Domain</label><input id="md-jira-domain" placeholder="e.g. yourcompany (from yourcompany.atlassian.net)"></div>
-            <div class="md-field-row"><label>Email</label><input id="md-jira-email" placeholder="you@company.com"></div>
-            <div class="md-field-row"><label>API Token</label><input id="md-jira-token" type="password" placeholder="Your Jira API token"></div>
-            <div class="md-field-row"><label>Project Key</label><input id="md-jira-project" placeholder="e.g. QA or PROJ"></div>
-          </div>
           <button class="md-modal-save" onclick="mdSaveSettings()">Save Settings</button>
         </div>
       </div>
@@ -724,7 +713,6 @@ code.md-status-error{color:var(--red) !important;background:var(--red-bg) !impor
         <div class="form-label">Source</div>
         <select id="import-source" onchange="toggleImportSourceFields()">
           <option value="github">GitHub</option>
-          <option value="jira">Jira</option>
         </select>
       </div>
       <div class="field-group">
@@ -747,10 +735,6 @@ code.md-status-error{color:var(--red) !important;background:var(--red-bg) !impor
       <div class="field-group" id="gh-specific-wrap" style="display:none">
         <div class="form-label">GitHub Issue Number</div>
         <input type="text" id="gh-issue-number" placeholder="e.g. 123" />
-      </div>
-      <div class="field-group" id="jira-specific-wrap" style="display:none">
-        <div class="form-label">Jira Issue Key</div>
-        <input type="text" id="jira-issue-key" placeholder="e.g. ABC-123" />
       </div>
     </div>
 
@@ -777,29 +761,7 @@ code.md-status-error{color:var(--red) !important;background:var(--red-bg) !impor
         <div class="field-group">
           <div class="form-label">Token (optional)</div>
           <input type="text" id="gh-token" placeholder="GitHub token for private repos" />
-        </div>
-      </div>
-    </div>
-
-    <div id="import-jira-fields" style="display:none">
-      <div class="form-grid" style="margin-top:8px">
-        <div class="field-group">
-          <div class="form-label">Jira Base URL</div>
-          <input type="text" id="jira-base" placeholder="https://your-domain.atlassian.net" />
-        </div>
-        <div class="field-group">
-          <div class="form-label">Email</div>
-          <input type="email" id="jira-email" placeholder="name@company.com" />
-        </div>
-      </div>
-      <div class="form-grid" style="margin-top:8px">
-        <div class="field-group">
-          <div class="form-label">API Token</div>
-          <input type="text" id="jira-token" placeholder="Atlassian API token" />
-        </div>
-        <div class="field-group">
-          <div class="form-label">JQL</div>
-          <input type="text" id="jira-jql" placeholder="project = ABC ORDER BY created DESC" />
+          <sub style="font-size:10px;color:#6a6a58">- recommended for private repos or higher rate limits, Token must have <code>repo</code> scope for private repos</sub>
         </div>
       </div>
     </div>
@@ -1414,7 +1376,7 @@ function addManualGateItem(){
   save();renderGate();updateStats();
 }
 
-// ─── IMPORT (GITHUB / JIRA) ─────────────────────────────────────
+// ─── IMPORT (GITHUB) ────────────────────────────────────────────
 function openImportModal(){
   var sel=document.getElementById('import-proj');
   if(!S.projects.length){
@@ -1437,7 +1399,6 @@ function openImportModal(){
 function toggleImportSourceFields(){
   var src=document.getElementById('import-source').value;
   document.getElementById('import-github-fields').style.display=(src==='github')?'':'none';
-  document.getElementById('import-jira-fields').style.display=(src==='jira')?'':'none';
   toggleImportModeFields();
 }
 function toggleImportModeFields(){
@@ -1446,7 +1407,6 @@ function toggleImportModeFields(){
   var isSingle=mode==='single';
   document.getElementById('import-limit-wrap').style.display=isSingle?'none':'';
   document.getElementById('gh-specific-wrap').style.display=(src==='github'&&isSingle)?'':'none';
-  document.getElementById('jira-specific-wrap').style.display=(src==='jira'&&isSingle)?'':'none';
 }
 function parseImportLimit(){
   var n=parseInt(document.getElementById('import-limit').value,10);
@@ -1517,18 +1477,6 @@ async function fetchImportPreview(){
       if(mode==='single'){
         payload.issueNumber=document.getElementById('gh-issue-number').value.trim();
         if(!payload.issueNumber)throw new Error('Enter a GitHub issue number');
-      }
-    } else {
-      payload.baseUrl=document.getElementById('jira-base').value.trim();
-      payload.email=document.getElementById('jira-email').value.trim();
-      payload.token=document.getElementById('jira-token').value.trim();
-      payload.jql=document.getElementById('jira-jql').value.trim();
-      if(!payload.baseUrl||!payload.email||!payload.token)throw new Error('Enter Jira base URL, email, and token');
-      if(mode==='single'){
-        payload.issueKey=document.getElementById('jira-issue-key').value.trim();
-        if(!payload.issueKey)throw new Error('Enter a Jira issue key');
-      } else {
-        if(!payload.jql)throw new Error('Enter Jira JQL');
       }
     }
 
@@ -2154,7 +2102,6 @@ save();
   window.mdSaveSettings = function(){
     var cfg = {
       gh: { owner: document.getElementById('md-gh-owner').value.trim(), repo: document.getElementById('md-gh-repo').value.trim(), token: document.getElementById('md-gh-token').value.trim() },
-      jira: { domain: document.getElementById('md-jira-domain').value.trim(), email: document.getElementById('md-jira-email').value.trim(), token: document.getElementById('md-jira-token').value.trim(), project: document.getElementById('md-jira-project').value.trim() }
     };
     localStorage.setItem('pg-md-cfg', JSON.stringify(cfg));
     mdCloseSettings();
@@ -2165,12 +2112,6 @@ save();
       document.getElementById('md-gh-owner').value = cfg.gh.owner || '';
       document.getElementById('md-gh-repo').value = cfg.gh.repo || '';
       document.getElementById('md-gh-token').value = cfg.gh.token || '';
-    }
-    if (cfg.jira){
-      document.getElementById('md-jira-domain').value = cfg.jira.domain || '';
-      document.getElementById('md-jira-email').value = cfg.jira.email || '';
-      document.getElementById('md-jira-token').value = cfg.jira.token || '';
-      document.getElementById('md-jira-project').value = cfg.jira.project || '';
     }
   }
   function mdGetCfg(){ return JSON.parse(localStorage.getItem('pg-md-cfg') || '{}'); }
@@ -2187,16 +2128,13 @@ save();
     var links = mdIssueLinks[key] || {};
     var cfg = mdGetCfg();
     var ghOk = cfg.gh && cfg.gh.owner && cfg.gh.repo && cfg.gh.token;
-    var jiraOk = cfg.jira && cfg.jira.domain && cfg.jira.email && cfg.jira.token && cfg.jira.project;
-
     pop.innerHTML =
       '<h4>🔗 Link Issue</h4>' +
       '<div class="md-pop-title">' + title.slice(0, 80) + (title.length > 80 ? '…' : '') + '</div>' +
       '<button class="md-pop-btn gh" id="md-pop-gh-btn" ' + (!ghOk ? 'disabled title="Configure GitHub in Integrations first"' : '') + '><span>●</span> ' + (links.gh ? 'Re-create on GitHub' : 'Create GitHub Issue') + '</button>' +
-      '<button class="md-pop-btn jira" id="md-pop-jira-btn" ' + (!jiraOk ? 'disabled title="Configure Jira in Integrations first"' : '') + '><span>◆</span> ' + (links.jira ? 'Re-create on Jira' : 'Create Jira Ticket') + '</button>' +
       '<div class="md-pop-divider"></div>' +
       '<div style="font-size:9px;color:var(--paper3);margin-bottom:5px;">Or paste an existing issue URL:</div>' +
-      '<div class="md-pop-link-row"><input id="md-pop-link-input" placeholder="https://github.com/... or https://jira..."><button id="md-pop-link-btn">Link</button></div>' +
+      '<div class="md-pop-link-row"><input id="md-pop-link-input" placeholder="https://github.com/..."><button id="md-pop-link-btn">Link</button></div>' +
       '<div class="md-pop-status" id="md-pop-status"></div>';
 
     document.body.appendChild(pop);
@@ -2206,7 +2144,6 @@ save();
     pop.style.left = Math.min(rect.left, window.innerWidth - 280) + 'px';
 
     pop.querySelector('#md-pop-gh-btn').addEventListener('click', function(){ mdCreateGithubIssue(key, title); });
-    pop.querySelector('#md-pop-jira-btn').addEventListener('click', function(){ mdCreateJiraIssue(key, title); });
     pop.querySelector('#md-pop-link-btn').addEventListener('click', function(){ mdLinkExisting(key); });
     pop.addEventListener('click', function(e){ e.stopPropagation(); });
   }
@@ -2239,29 +2176,6 @@ save();
     }).catch(function(e){ mdSetPopStatus('Error: ' + e.message, 'err'); });
   }
 
-  function mdCreateJiraIssue(key, title){
-    var cfg = mdGetCfg().jira;
-    if (!cfg || !cfg.domain) return;
-    mdSetPopStatus('Creating Jira ticket…', 'loading');
-    var auth = btoa(cfg.email + ':' + cfg.token);
-    fetch('https://' + cfg.domain + '.atlassian.net/rest/api/2/issue', {
-      method: 'POST',
-      headers: { 'Authorization': 'Basic ' + auth, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fields: { project: { key: cfg.project }, summary: title.trim(), description: 'QA Tracker issue:\n' + title, issuetype: { name: 'Bug' } } })
-    }).then(function(res){
-      return res.json().then(function(data){ return { res: res, data: data }; });
-    }).then(function(r){
-      if (!r.res.ok) throw new Error(JSON.stringify(r.data.errors || r.data.errorMessages || r.res.status));
-      if (!mdIssueLinks[key]) mdIssueLinks[key] = {};
-      var jiraUrl = 'https://' + cfg.domain + '.atlassian.net/browse/' + r.data.key;
-      mdIssueLinks[key].jira = { url: jiraUrl, key: r.data.key };
-      mdSetPopStatus('✓ Jira ticket created: ' + r.data.key, 'ok');
-      mdRefreshIssueBtns();
-      mdSaveCurrentToIssue();
-      setTimeout(mdClosePopover, 1800);
-    }).catch(function(e){ mdSetPopStatus('Error: ' + e.message, 'err'); });
-  }
-
   function mdLinkExisting(key){
     var input = document.getElementById('md-pop-link-input');
     var url = input ? input.value.trim() : '';
@@ -2271,10 +2185,6 @@ save();
       var num = url.split('/').pop();
       mdIssueLinks[key].gh = { url: url, num: '#' + num };
       mdSetPopStatus('✓ Linked GitHub issue', 'ok');
-    } else if (url.indexOf('atlassian.net') !== -1){
-      var k = url.split('/browse/')[1] || url.split('/').pop();
-      mdIssueLinks[key].jira = { url: url, key: k };
-      mdSetPopStatus('✓ Linked Jira ticket', 'ok');
     } else {
       mdIssueLinks[key].gh = { url: url, num: 'link' };
       mdSetPopStatus('✓ Linked', 'ok');
@@ -2288,12 +2198,11 @@ save();
     document.querySelectorAll('.md-issue-btn').forEach(function(btn){
       var key = btn.dataset.key;
       var links = mdIssueLinks[key] || {};
-      btn.classList.toggle('has-link', !!(links.gh || links.jira));
+      btn.classList.toggle('has-link', !!links.gh);
       var cbs = btn.closest('.md-li-cbs');
       if (!cbs) return;
       cbs.querySelectorAll('.md-linked-badge').forEach(function(b){ b.remove(); });
       if (links.gh) cbs.appendChild(mdMakeBadge(links.gh.url, links.gh.num, 'gh'));
-      if (links.jira) cbs.appendChild(mdMakeBadge(links.jira.url, links.jira.key, 'jira'));
     });
   }
 
@@ -2314,11 +2223,10 @@ save();
     btn.dataset.key = key;
     btn.textContent = '⊕ Issue';
     var links = mdIssueLinks[key] || {};
-    if (links.gh || links.jira) btn.classList.add('has-link');
+    if (links.gh) btn.classList.add('has-link');
     btn.addEventListener('click', function(e){ e.stopPropagation(); mdOpenIssuePopover(btn, key, title); });
     cbs.appendChild(btn);
     if (links.gh) cbs.appendChild(mdMakeBadge(links.gh.url, links.gh.num, 'gh'));
-    if (links.jira) cbs.appendChild(mdMakeBadge(links.jira.url, links.jira.key, 'jira'));
   }
 
   window.mdInitEditorPanel = mdInit;

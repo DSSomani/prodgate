@@ -43,14 +43,6 @@ function normalizeGitHubItems(items) {
     }));
 }
 
-function normalizeJiraItems(issues) {
-  return issues.map(it => ({
-    key: it.key || '',
-    title: (it.fields && it.fields.summary) || 'Untitled',
-    url: ''
-  }));
-}
-
 async function fetchGitHub(payload) {
   const owner = (payload.owner || '').trim();
   const repo = (payload.repo || '').trim();
@@ -96,61 +88,6 @@ async function fetchGitHub(payload) {
   return normalizeGitHubItems(Array.isArray(data) ? data : []);
 }
 
-async function fetchJira(payload) {
-  const mode = (payload.mode || 'list').trim();
-  const baseUrlRaw = (payload.baseUrl || '').trim();
-  const email = (payload.email || '').trim();
-  const token = (payload.token || '').trim();
-  const jql = (payload.jql || '').trim();
-  const issueKey = (payload.issueKey || '').trim();
-  const limit = Math.max(1, Math.min(100, Number(payload.limit) || 20));
-
-  if (!baseUrlRaw || !email || !token) {
-    throw new Error('baseUrl, email, and token are required for Jira import');
-  }
-
-  let base;
-  try {
-    base = new URL(baseUrlRaw);
-  } catch {
-    throw new Error('Invalid Jira base URL');
-  }
-
-  const jiraUrl = mode === 'single'
-    ? new URL(`/rest/api/3/issue/${encodeURIComponent(issueKey)}`, base)
-    : new URL('/rest/api/3/search', base);
-  if (mode === 'single') {
-    if (!issueKey) throw new Error('issueKey is required for Jira specific issue import');
-    jiraUrl.searchParams.set('fields', 'summary');
-  } else {
-    if (!jql) throw new Error('jql is required for Jira list import');
-    jiraUrl.searchParams.set('jql', jql);
-    jiraUrl.searchParams.set('maxResults', String(limit));
-    jiraUrl.searchParams.set('fields', 'summary');
-  }
-
-  const basic = Buffer.from(`${email}:${token}`).toString('base64');
-  const response = await fetch(jiraUrl, {
-    headers: {
-      'Accept': 'application/json',
-      'Authorization': `Basic ${basic}`
-    }
-  });
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const msg = data && data.errorMessages && data.errorMessages[0]
-      ? data.errorMessages[0]
-      : 'Jira API request failed';
-    throw new Error(msg);
-  }
-
-  if (mode === 'single') {
-    return normalizeJiraItems(data ? [data] : []);
-  }
-  return normalizeJiraItems(Array.isArray(data.issues) ? data.issues : []);
-}
-
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
@@ -167,10 +104,8 @@ const server = http.createServer(async (req, res) => {
       const payload = await readJsonBody(req);
       const source = (payload.source || '').trim();
 
-      let items = [];
-      if (source === 'github') items = await fetchGitHub(payload);
-      else if (source === 'jira') items = await fetchJira(payload);
-      else throw new Error('source must be github or jira');
+      if (source !== 'github') throw new Error('source must be github');
+      const items = await fetchGitHub(payload);
 
       return sendJson(res, 200, { items });
     } catch (error) {
